@@ -23,7 +23,8 @@ import {
     TouchableOpacity,
     KeyboardAvoidingView,
     TextInput,
-    Keyboard
+    Keyboard,
+    ImageBackground
 } from 'react-native';
 
 import {stylesGlobal} from '../styles/stylesGlobal';
@@ -32,11 +33,11 @@ const { width, height } = Dimensions.get("window");
 const isIos = Platform.OS === 'ios'
 const isIphoneX = isIos && (Dimensions.get('window').height === 812 || Dimensions.get('window').height === 896);
 
-export default class IntroThirdScreen extends Component {
+export default class SummaryScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            contents_text: 'Each mission has it own score that will be determined with the qulity of your creative',
+            contents_text: 'Today we will invistigate the use of symbols but from a different angle We are waiting to see your take on the mission',
         }
     }
 
@@ -56,33 +57,22 @@ export default class IntroThirdScreen extends Component {
                     <View style = {stylesGlobal.left_color_bar_fifth}/>
                 </View>
                 <View style = {styles.main_container}>
-                    <TouchableOpacity style = {styles.skip_button} onPress = {() => alert("sdfasdf")}>
-                        <Text style = {stylesGlobal.general_font_style}>SKIP</Text>
-                    </TouchableOpacity>
-                    <View style = {{width: '100%', height: 150, alignItems: 'center', justifyContent: 'center'}}>
-                        <Image style = {{width: '100%', height: 40, resizeMode: 'contain'}} source = {require("../assets/images/logo.png")}/>
-                    </View>
-                    <View style = {{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-                        <View style = {{flex: 1, width: '100%', alignItems: 'center', justifyContent: 'center'}}>
-                            <Image style = {{width: '100%', height: width * 0.3, resizeMode: 'contain'}} source = {require("../assets/images/intro3_icon.png")}/>
-                        </View>
-                        <View style = {{flex: 1.5, width: '100%', alignItems: 'center'}}>
-                            <Text style = {[stylesGlobal.general_font_style, {fontSize: 24,}]}>THE MISSION</Text>
-                            <View style = {{width: '80%', alignItems: 'center', justifyContent: 'center', marginTop: 20}}>
-                                <Text style = {[stylesGlobal.general_font_style, {fontSize: 18, textAlign: 'center', color: '#7A7A7A'}]}>{this.state.contents_text}</Text>
-                            </View>
-                            <View style = {{width: '100%', marginTop: 50, justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
-                                <View style = {[styles.dot_style, {backgroundColor: '#FFFFFF'}]}/>
-                                <View style = {[styles.dot_style, {backgroundColor: '#FFFFFF', marginLeft: 15}]}/>
-                                <View style = {[styles.dot_style, {marginLeft: 15}]}/>
-                            </View>
+                    <View style = {{flex: 1, width: '100%', alignItems: 'center', marginTop: 60}}>
+                        <Image style = {{width: 80, height: 80, resizeMode: 'contain'}} source = {require("../assets/images/intro1_icon.png")}/>
+                        <ImageBackground style = {{width: '80%', height: 150, justifyContent: 'center', alignItems: 'center', backgroundColor: '#999999'}}>
+
+                        </ImageBackground>
+                        <Image style = {{width: '100%', height: 80, marginTop: 50, resizeMode: 'contain'}} source = {require("../assets/images/summary_flag.png")}/>
+                        <View style = {{width: '80%', alignItems: 'center', justifyContent: 'center', marginTop: 20}}>
+                            <Text style = {[stylesGlobal.general_font_style, {fontSize: 24,}]}>GET READY FOR YOUR</Text>
+                            <Text style = {[stylesGlobal.general_font_style, {fontSize: 24,}]}>FIRST MISSION</Text>
                         </View>
                     </View>
-                    <View style = {{width: '100%', height: 40, justifyContent: 'center', alignItems: 'center', marginBottom: isIphoneX ? 50 : 15}}>
-                        <TouchableOpacity style = {stylesGlobal.intro_button} onPress = {() => this.props.navigation.navigate("SummaryScreen")}>
+                    {/* <View style = {{width: '100%', height: 40, justifyContent: 'center', alignItems: 'center', marginBottom: isIphoneX ? 50 : 15}}>
+                        <TouchableOpacity style = {stylesGlobal.intro_button}>
                             <Text style = {[stylesGlobal.general_font_style, {fontSize: 18, textAlign: 'center'}]}>NEXT</Text>
                         </TouchableOpacity>
-                    </View>
+                    </View> */}
                 </View>
             </View>
         );

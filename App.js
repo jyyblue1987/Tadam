@@ -24,6 +24,7 @@ import SignInScreen from './app/screens/SignInScreen';
 import IntroFirstScreen from './app/screens/IntroFirstScreen';
 import IntroSecondScreen from './app/screens/IntroSecondScreen';
 import IntroThirdScreen from './app/screens/IntroThirdScreen';
+import SummaryScreen from './app/screens/SummaryScreen';
 
 const Stack = createStackNavigator();
 
@@ -48,8 +49,8 @@ export default class App extends Component {
                     <Stack.Screen name="IntroFirstScreen" component={IntroFirstScreen} />
                     <Stack.Screen name="IntroSecondScreen" component={IntroSecondScreen} />
                     <Stack.Screen name="IntroThirdScreen" component={IntroThirdScreen} />
-                    {/* <Stack.Screen name="Verification" component={Verification} />
-                    <Stack.Screen name="LandingSummary1" component={LandingSummary1} />
+                    <Stack.Screen name="SummaryScreen" component={SummaryScreen} />
+                    {/* <Stack.Screen name="LandingSummary1" component={LandingSummary1} />
                     <Stack.Screen name="LandingSummary2" component={LandingSummary2} />
 
                     <Stack.Screen name="MainTabNavigator" component={MainTabNavigator} /> */}
