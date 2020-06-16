@@ -22,6 +22,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import SignInScreen from './app/screens/SignInScreen';
 import IntroFirstScreen from './app/screens/IntroFirstScreen';
+import IntroSecondScreen from './app/screens/IntroSecondScreen';
+import IntroThirdScreen from './app/screens/IntroThirdScreen';
 
 const Stack = createStackNavigator();
 
@@ -44,9 +46,9 @@ export default class App extends Component {
                 >
                     <Stack.Screen name="SignInScreen" component={SignInScreen} />
                     <Stack.Screen name="IntroFirstScreen" component={IntroFirstScreen} />
-                    {/* <Stack.Screen name="TermsAndCondition" component={TermsAndCondition} />
-                    <Stack.Screen name="SignUpScreen" component={SignUpScreen} />
-                    <Stack.Screen name="Verification" component={Verification} />
+                    <Stack.Screen name="IntroSecondScreen" component={IntroSecondScreen} />
+                    <Stack.Screen name="IntroThirdScreen" component={IntroThirdScreen} />
+                    {/* <Stack.Screen name="Verification" component={Verification} />
                     <Stack.Screen name="LandingSummary1" component={LandingSummary1} />
                     <Stack.Screen name="LandingSummary2" component={LandingSummary2} />
 

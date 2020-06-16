@@ -32,11 +32,11 @@ const { width, height } = Dimensions.get("window");
 const isIos = Platform.OS === 'ios'
 const isIphoneX = isIos && (Dimensions.get('window').height === 812 || Dimensions.get('window').height === 896);
 
-export default class IntroFirstScreen extends Component {
+export default class IntroSecondScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            contents_text: 'For each mission in the game you have to be creative according to the rules of the mission',
+            contents_text: 'Each mission has it own score that will be determined with the qulity of your creative',
         }
     }
 
@@ -64,23 +64,23 @@ export default class IntroFirstScreen extends Component {
                     </View>
                     <View style = {{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
                         <View style = {{flex: 1, width: '100%', alignItems: 'center', justifyContent: 'center'}}>
-                            <Image style = {{width: '100%', height: width * 0.3, resizeMode: 'contain'}} source = {require("../assets/images/intro1_icon.png")}/>
+                            <Image style = {{width: '100%', height: width * 0.3, resizeMode: 'contain'}} source = {require("../assets/images/intro2_icon.png")}/>
                         </View>
                         <View style = {{flex: 1.5, width: '100%', alignItems: 'center'}}>
-                            <Text style = {[stylesGlobal.general_font_style, {fontSize: 24,}]}>WELCOME</Text>
+                            <Text style = {[stylesGlobal.general_font_style, {fontSize: 24,}]}>TIMING IS EVERYTHING</Text>
                             <View style = {{width: '80%', alignItems: 'center', justifyContent: 'center', marginTop: 20}}>
                                 <Text style = {[stylesGlobal.general_font_style, {fontSize: 18, textAlign: 'center', color: '#7A7A7A'}]}>{this.state.contents_text}</Text>
                             </View>
                             <View style = {{width: '100%', marginTop: 50, justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
-                                <View style = {styles.dot_style}/>
-                                <View style = {[styles.dot_style, {backgroundColor: '#FFFFFF', marginLeft: 15}]}/>
+                                <View style = {[styles.dot_style, {backgroundColor: '#FFFFFF'}]}/>
+                                <View style = {[styles.dot_style, {marginLeft: 15}]}/>
                                 <View style = {[styles.dot_style, {backgroundColor: '#FFFFFF', marginLeft: 15}]}/>
                             </View>
                         </View>
                     </View>
                     <View style = {{width: '100%', height: 40, justifyContent: 'center', alignItems: 'center', marginBottom: isIphoneX ? 50 : 15}}>
-                        <TouchableOpacity style = {stylesGlobal.intro_button} onPress = {() => this.props.navigation.navigate("IntroSecondScreen")}>
-                            <Text style = {[stylesGlobal.general_font_style, {fontSize: 18, textAlign: 'center'}]}>OK</Text>
+                        <TouchableOpacity style = {stylesGlobal.intro_button} onPress = {() => this.props.navigation.navigate("IntroThirdScreen")}>
+                            <Text style = {[stylesGlobal.general_font_style, {fontSize: 18, textAlign: 'center'}]}>UNDERSTOOD</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
