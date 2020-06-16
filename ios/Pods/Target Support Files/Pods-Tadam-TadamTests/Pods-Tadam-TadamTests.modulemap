@@ -1,0 +1,6 @@
+module Pods_Tadam_TadamTests {
+  umbrella header "Pods-Tadam-TadamTests-umbrella.h"
+
+  export *
+  module * { export * }
+}
