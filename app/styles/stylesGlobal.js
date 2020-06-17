@@ -5,6 +5,16 @@
 //  Copyright © 2020 Water Flower(waterflower12591@gmail.com). All rights reserved. 
 //
 
+import {
+    Dimensions, 
+    Platform,
+} from 'react-native';
+
+
+const { width, height } = Dimensions.get("window");
+const isIos = Platform.OS === 'ios'
+const isIphoneX = isIos && (Dimensions.get('window').height === 812 || Dimensions.get('window').height === 896);
+
 export const stylesGlobal = {
     left_color_bar: {
         width: 10,
@@ -50,6 +60,55 @@ export const stylesGlobal = {
         borderWidth: 1, 
         borderColor: '#000000', 
         justifyContent: 'center', 
+        alignItems: 'center'
+    },
+    mission_shadow_view: {
+        flex: 1, 
+        width: '90%', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        marginTop: 20, 
+        marginBottom: isIphoneX ? 45 : 20, 
+        borderRadius: 10, 
+        shadowColor: '#808080',
+        shadowOffset: {
+            width: 0,
+            height: 0
+        },
+        shadowRadius: 7,
+        shadowOpacity: 0.3,
+        backgroundColor: '#ffffff',
+        elevation: 10,
+        paddingVertical: 10,
+        paddingHorizontal: 10
+    },
+    mission_color_view: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 5,
+        alignItems: 'center',
+        paddingVertical: 20,
+        paddingHorizontal: 20
+    },
+    mission_avatar_image: {
+        width: 40,
+        height: 40,
+        resizeMode: 'contain'
+    },
+    mission_camera_container_view: {
+        width: 80,
+        height: 80,
+        borderRadius: 80,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    mission_button: {
+        width: '100%',
+        height: 40,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: '#ffffff',
+        justifyContent: 'center',
         alignItems: 'center'
     }
 }

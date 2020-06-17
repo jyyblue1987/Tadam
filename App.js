@@ -25,6 +25,12 @@ import IntroFirstScreen from './app/screens/IntroFirstScreen';
 import IntroSecondScreen from './app/screens/IntroSecondScreen';
 import IntroThirdScreen from './app/screens/IntroThirdScreen';
 import SummaryScreen from './app/screens/SummaryScreen';
+import MissionFirstScreen from './app/screens/MissionFirstScreen';
+import MissionSecondScreen from './app/screens/MissionSecondScreen';
+import MissionThirdScreen from './app/screens/MissionThirdScreen';
+import PictureCaptureScreen from './app/screens/PictureCaptureScreen';
+import PictureCheckScreen from './app/screens/PictureCheckScreen';
+import CreateSummaryScreen from './app/screens/CreateSummaryScreen';
 
 const Stack = createStackNavigator();
 
@@ -50,11 +56,12 @@ export default class App extends Component {
                     <Stack.Screen name="IntroSecondScreen" component={IntroSecondScreen} />
                     <Stack.Screen name="IntroThirdScreen" component={IntroThirdScreen} />
                     <Stack.Screen name="SummaryScreen" component={SummaryScreen} />
-                    {/* <Stack.Screen name="LandingSummary1" component={LandingSummary1} />
-                    <Stack.Screen name="LandingSummary2" component={LandingSummary2} />
-
-                    <Stack.Screen name="MainTabNavigator" component={MainTabNavigator} /> */}
-                    
+                    <Stack.Screen name="MissionFirstScreen" component={MissionFirstScreen} />
+                    <Stack.Screen name="MissionSecondScreen" component={MissionSecondScreen} />
+                    <Stack.Screen name="MissionThirdScreen" component={MissionThirdScreen} />
+                    <Stack.Screen name="PictureCaptureScreen" component={PictureCaptureScreen} />
+                    <Stack.Screen name="PictureCheckScreen" component={PictureCheckScreen} />
+                    <Stack.Screen name="CreateSummaryScreen" component={CreateSummaryScreen} />
                 </Stack.Navigator>
             </NavigationContainer>
 

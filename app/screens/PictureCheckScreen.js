@@ -33,11 +33,10 @@ const { width, height } = Dimensions.get("window");
 const isIos = Platform.OS === 'ios'
 const isIphoneX = isIos && (Dimensions.get('window').height === 812 || Dimensions.get('window').height === 896);
 
-export default class SummaryScreen extends Component {
+export default class PictureCheckScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            contents_text: 'Today we will invistigate the use of symbols but from a different angle We are waiting to see your take on the mission',
         }
     }
 
@@ -57,24 +56,22 @@ export default class SummaryScreen extends Component {
                     <View style = {stylesGlobal.left_color_bar_fifth}/>
                 </View>
                 <View style = {styles.main_container}>
-                    <View style = {{flex: 1, width: '100%', alignItems: 'center', marginTop: 60}}>
-                        <Image style = {{width: 80, height: 80, resizeMode: 'contain'}} source = {require("../assets/images/intro1_icon.png")}/>
-                        {/* <ImageBackground style = {{width: '80%', height: 150, justifyContent: 'center', alignItems: 'center', resizeMode: 'contain', backgroundColor: '#999999'}} source = {require("../assets/images/summary_message_container.png")}>
-
-                        </ImageBackground> */}
-                        <View style = {{width: '80%', alignItems: 'center'}}>
-                            <Image style = {{width: 40, height: 80, resizeMode: 'contain'}} source = {require("../assets/images/summary_message_container.png")}/>
+                    <View style = {{flex: 1, width: '100%', alignItems: 'center', marginTop: isIphoneX ? 55 : 20}}>
+                        <Image style = {{width: 80, height: 80, resizeMode: 'contain'}} source = {require("../assets/images/mission_number3.png")}/>
+                        <Text style = {[stylesGlobal.general_font_style, {fontSize: 24, marginTop: 20}]}>YOUR CREATION</Text>
+                        <View style = {stylesGlobal.mission_shadow_view}>
+                            <View style = {[stylesGlobal.mission_color_view, {backgroundColor: '#FED766'}]}>
+                                
+                            </View>
                         </View>
-                        <Image style = {{width: '100%', height: 80, marginTop: 50, resizeMode: 'contain'}} source = {require("../assets/images/summary_flag.png")}/>
-                        <View style = {{width: '80%', alignItems: 'center', justifyContent: 'center', marginTop: 20}}>
-                            <Text style = {[stylesGlobal.general_font_style, {fontSize: 24,}]}>GET READY FOR YOUR</Text>
-                            <Text style = {[stylesGlobal.general_font_style, {fontSize: 24,}]}>FIRST MISSION</Text>
+                        <View style = {{width: '100%', height: 40, flexDirection: 'row', marginBottom: isIphoneX ? 45 : 20, justifyContent: 'center', alignItems: 'center'}}>
+                            <TouchableOpacity style = {{width: 40, height: 40, borderRadius: 40, borderWidth: 1, borderColor: '#808080', justifyContent: 'center', alignItems: 'center'}} onPress = {() => this.props.navigation.goBack()}>
+                                <Image style = {{width: 20, height: 20, resizeMode: 'contain', tintColor: '#808080'}} source = {require("../assets/images/left_arrow.png")}></Image>
+                            </TouchableOpacity>
+                            <TouchableOpacity style = {{width: '60%', height: 40, marginLeft: 10, borderRadius: 40, borderWidth: 1, borderColor: '#808080', justifyContent: 'center', alignItems: 'center'}}  onPress = {() => this.props.navigation.navigate("CreateSummaryScreen")}>
+                                <Image style = {{width: '100%', height: '60%', resizeMode: 'contain'}} source = {require("../assets/images/logo.png")}></Image>
+                            </TouchableOpacity>
                         </View>
-                    </View>
-                    <View style = {{width: '100%', height: 40, justifyContent: 'center', alignItems: 'center', marginBottom: isIphoneX ? 50 : 15}}>
-                        <TouchableOpacity style = {stylesGlobal.intro_button} onPress = {() => this.props.navigation.navigate("MissionFirstScreen")}>
-                            <Text style = {[stylesGlobal.general_font_style, {fontSize: 18, textAlign: 'center'}]}>NEXT</Text>
-                        </TouchableOpacity>
                     </View>
                 </View>
             </View>
