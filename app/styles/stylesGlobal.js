@@ -79,16 +79,14 @@ export const stylesGlobal = {
         shadowOpacity: 0.3,
         backgroundColor: '#ffffff',
         elevation: 10,
-        paddingVertical: 10,
-        paddingHorizontal: 10
+        padding: 10,
     },
     mission_color_view: {
         width: '100%',
         height: '100%',
         borderRadius: 5,
         alignItems: 'center',
-        paddingVertical: 20,
-        paddingHorizontal: 20
+        padding: 20,
     },
     mission_avatar_image: {
         width: 40,

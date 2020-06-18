@@ -37,6 +37,7 @@ export default class PictureCheckScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            image_uri: props.route.params.image_uri,
         }
     }
 
@@ -57,18 +58,18 @@ export default class PictureCheckScreen extends Component {
                 </View>
                 <View style = {styles.main_container}>
                     <View style = {{flex: 1, width: '100%', alignItems: 'center', marginTop: isIphoneX ? 55 : 20}}>
-                        <Image style = {{width: 80, height: 80, resizeMode: 'contain'}} source = {require("../assets/images/mission_number3.png")}/>
+                        <Image style = {{width: 80, height: 80, resizeMode: 'contain'}} source = {require("../assets/images/faceicon.png")}/>
                         <Text style = {[stylesGlobal.general_font_style, {fontSize: 24, marginTop: 20}]}>YOUR CREATION</Text>
                         <View style = {stylesGlobal.mission_shadow_view}>
-                            <View style = {[stylesGlobal.mission_color_view, {backgroundColor: '#FED766'}]}>
-                                
+                            <View style = {[stylesGlobal.mission_color_view, {backgroundColor: '#FED766', paddingVertical: 0, paddingHorizontal: 0, overflow: 'hidden'}]}>
+                                <Image style = {{width: '100%', height: '100%', resizeMode: 'cover'}} source={this.state.image_uri != "" ? {uri: this.state.image_uri} : {}}></Image>
                             </View>
                         </View>
                         <View style = {{width: '100%', height: 40, flexDirection: 'row', marginBottom: isIphoneX ? 45 : 20, justifyContent: 'center', alignItems: 'center'}}>
                             <TouchableOpacity style = {{width: 40, height: 40, borderRadius: 40, borderWidth: 1, borderColor: '#808080', justifyContent: 'center', alignItems: 'center'}} onPress = {() => this.props.navigation.goBack()}>
                                 <Image style = {{width: 20, height: 20, resizeMode: 'contain', tintColor: '#808080'}} source = {require("../assets/images/left_arrow.png")}></Image>
                             </TouchableOpacity>
-                            <TouchableOpacity style = {{width: '60%', height: 40, marginLeft: 10, borderRadius: 40, borderWidth: 1, borderColor: '#808080', justifyContent: 'center', alignItems: 'center'}}  onPress = {() => this.props.navigation.navigate("CreateSummaryScreen")}>
+                            <TouchableOpacity style = {{width: '60%', height: 40, marginLeft: 10, borderRadius: 40, borderWidth: 1, borderColor: '#808080', justifyContent: 'center', alignItems: 'center'}}  onPress = {() => this.props.navigation.navigate("CreateSummaryScreen", {image_uri: this.state.image_uri})}>
                                 <Image style = {{width: '100%', height: '60%', resizeMode: 'contain'}} source = {require("../assets/images/logo.png")}></Image>
                             </TouchableOpacity>
                         </View>

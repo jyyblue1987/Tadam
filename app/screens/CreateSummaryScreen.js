@@ -37,7 +37,8 @@ export default class CreateSummaryScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            contents_text: "people will get a chance to rank your creation, mean whille relax and rank the other candidates"
+            contents_text: "people will get a chance to rank your creation, mean whille relax and rank the other candidates",
+            image_uri: props.route.params.image_uri,
         }
     }
 
@@ -58,19 +59,19 @@ export default class CreateSummaryScreen extends Component {
                 </View>
                 <View style = {styles.main_container}>
                     <View style = {{flex: 1, width: '100%', alignItems: 'center', marginTop: isIphoneX ? 55 : 20}}>
-                        <Image style = {{width: 80, height: 80, resizeMode: 'contain'}} source = {require("../assets/images/mission_number3.png")}/>
-                        <Text style = {[stylesGlobal.general_font_style, {fontSize: 24, marginTop: 20}]}>YOUR CREATION</Text>
+                        <Image style = {{width: 80, height: 80, resizeMode: 'contain'}} source = {require("../assets/images/faceicon.png")}/>
+                        <Text style = {[stylesGlobal.general_font_style, {fontSize: 24, marginTop: 20}]}>GOOD JOB!</Text>
                         <View style = {{width: '80%', alignItems: 'center', marginTop: 20, marginBottom: 20}}>
                             <Text style = {[stylesGlobal.general_font_style, {fontSize: 18, textAlign: 'center'}]}>{this.state.contents_text}</Text>
                         </View>
                         
                         <View style = {stylesGlobal.mission_shadow_view}>
-                            <View style = {[stylesGlobal.mission_color_view, {backgroundColor: '#FED766'}]}>
-                                
+                            <View style = {[stylesGlobal.mission_color_view, {backgroundColor: '#FED766', paddingVertical: 0, paddingHorizontal: 0, overflow: 'hidden'}]}>
+                                <Image style = {{width: '100%', height: '100%', resizeMode: 'cover'}} source={this.state.image_uri != "" ? {uri: this.state.image_uri} : {}}></Image>
                             </View>
                         </View>
                         <View style = {{width: '100%', height: 40, marginBottom: isIphoneX ? 45 : 20, justifyContent: 'center', alignItems: 'center'}}>
-                            <TouchableOpacity style = {{width: '80%', height: 40, marginLeft: 10, borderRadius: 40, borderWidth: 1, borderColor: '#808080', justifyContent: 'center', alignItems: 'center'}}  onPress = {() => this.props.navigation.navigate("PictureCheckScreen")}>
+                            <TouchableOpacity style = {{width: '80%', height: 40, borderRadius: 40, borderWidth: 1, borderColor: '#808080', justifyContent: 'center', alignItems: 'center'}}  onPress = {() => this.props.navigation.navigate("RankIntroScreen")}>
                                 <Text style = {[stylesGlobal.general_font_style, {fontSize: 18, color: '#2AB7CA'}]}>ALRIGHT!</Text>
                             </TouchableOpacity>
                         </View>

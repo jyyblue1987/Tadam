@@ -58,12 +58,13 @@ export default class SummaryScreen extends Component {
                 </View>
                 <View style = {styles.main_container}>
                     <View style = {{flex: 1, width: '100%', alignItems: 'center', marginTop: 60}}>
-                        <Image style = {{width: 80, height: 80, resizeMode: 'contain'}} source = {require("../assets/images/intro1_icon.png")}/>
-                        {/* <ImageBackground style = {{width: '80%', height: 150, justifyContent: 'center', alignItems: 'center', resizeMode: 'contain', backgroundColor: '#999999'}} source = {require("../assets/images/summary_message_container.png")}>
-
-                        </ImageBackground> */}
-                        <View style = {{width: '80%', alignItems: 'center'}}>
-                            <Image style = {{width: 40, height: 80, resizeMode: 'contain'}} source = {require("../assets/images/summary_message_container.png")}/>
+                        <Image style = {{width: 80, height: 80, resizeMode: 'contain'}} source = {require("../assets/images/faceicon.png")}/>
+                        <View style = {{width: '90%', height: 150,}}>
+                            <ImageBackground style = {{width: '100%', height: '100%' }} resizeMode = {'stretch'} source = {require("../assets/images/summary_message_container.png")}>
+                                <View style = {{width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20}}>
+                                    <Text style = {[stylesGlobal.general_font_style, {fontSize: 18, textAlign: 'center', color: '#7A7A7A'}]}>{this.state.contents_text}</Text>
+                                </View>
+                            </ImageBackground>
                         </View>
                         <Image style = {{width: '100%', height: 80, marginTop: 50, resizeMode: 'contain'}} source = {require("../assets/images/summary_flag.png")}/>
                         <View style = {{width: '80%', alignItems: 'center', justifyContent: 'center', marginTop: 20}}>

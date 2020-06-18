@@ -31,6 +31,12 @@ import MissionThirdScreen from './app/screens/MissionThirdScreen';
 import PictureCaptureScreen from './app/screens/PictureCaptureScreen';
 import PictureCheckScreen from './app/screens/PictureCheckScreen';
 import CreateSummaryScreen from './app/screens/CreateSummaryScreen';
+import RankIntroScreen from './app/screens/RankIntroScreen';
+import RankAnswerScreen from './app/screens/RankAnswerScreen';
+import YourRateScreen from './app/screens/YourRateScreen';
+import YourRankScreen from './app/screens/YourRankScreen';
+import SendEmailScreen from './app/screens/SendEmailScreen';
+import ConclusionScreen from './app/screens/ConclusionScreen';
 
 const Stack = createStackNavigator();
 
@@ -62,6 +68,12 @@ export default class App extends Component {
                     <Stack.Screen name="PictureCaptureScreen" component={PictureCaptureScreen} />
                     <Stack.Screen name="PictureCheckScreen" component={PictureCheckScreen} />
                     <Stack.Screen name="CreateSummaryScreen" component={CreateSummaryScreen} />
+                    <Stack.Screen name="RankIntroScreen" component={RankIntroScreen} />
+                    <Stack.Screen name="RankAnswerScreen" component={RankAnswerScreen} />
+                    <Stack.Screen name="YourRateScreen" component={YourRateScreen} />
+                    <Stack.Screen name="YourRankScreen" component={YourRankScreen} />
+                    <Stack.Screen name="SendEmailScreen" component={SendEmailScreen} />
+                    <Stack.Screen name="ConclusionScreen" component={ConclusionScreen} />
                 </Stack.Navigator>
             </NavigationContainer>
 
