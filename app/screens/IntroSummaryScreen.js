@@ -28,27 +28,110 @@ import {
 } from 'react-native';
 
 import {stylesGlobal} from '../styles/stylesGlobal';
+import ProgressIndicator from "../components/ProgressIndicator";
+import * as Global from "../Global/Global";
 
 const { width, height } = Dimensions.get("window");
 const isIos = Platform.OS === 'ios'
 const isIphoneX = isIos && (Dimensions.get('window').height === 812 || Dimensions.get('window').height === 896);
 
-export default class SummaryScreen extends Component {
+export default class IntroSummaryScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            loading: false,
             contents_text: 'Today we will invistigate the use of symbols but from a different angle We are waiting to see your take on the mission',
+            count_down_time: "00:00:00"
         }
     }
 
-    UNSAFE_componentWillMount() {
-        
+    UNSAFE_componentWillMount = async() => {
+        this.setState({
+            loading: true
+        })
+
+
+        await fetch(Global.BASE_URL + 'index.php/game/?gameAuthToken=' + Global.gameAuthToken, {
+            method: "GET",
+        })
+        .then(response => {
+            return response.json();
+        })
+        .then(responseData => {
+            
+            if(responseData.success) {
+                // var gameStartTimestamp = responseData.gameStartTimestamp;
+                var gameStartTimestamp = Global.gamestart_time
+                var current_time = Date.now();
+                // current_time = 1593245500000
+                
+                if(Math.floor(current_time / 1000) >= gameStartTimestamp) {
+                    this.props.navigation.navigate("MissionFirstScreen");
+                } else {
+                    var difference_time = gameStartTimestamp - Math.floor(current_time / 1000);
+                    this.setState({
+                        count_down_time: this.format_time(difference_time)
+                    })
+                    this.timer = setInterval(() => {
+                        difference_time -= 1;
+                        this.setState({
+                            count_down_time: this.format_time(difference_time)
+                        })
+                        if(difference_time == 0) {
+                            clearInterval(this.timer);
+                            this.props.navigation.navigate("MissionFirstScreen");
+                        }
+                    }, 1000);
+                }
+            } else {
+                var error_text = responseData.error_text;
+                if(error_text == null) {
+                    error_text = "";
+                }
+                Alert.alert("Warning!", error_text);
+            }
+            
+        })
+        .catch(error => {
+            console.log(error)
+            Alert.alert("Warning!", "Network error");
+        });
+        this.setState({
+            loading: false
+        })
     }
 
+    format_time(seconds_time) {
+        var hour = Math.floor(seconds_time / 3600);
+        var minute = Math.floor((seconds_time - 3600 * hour) / 60);
+        var seconds = seconds_time - 3600 * hour - 60 * minute;
+        var hour_str = "";
+        var minute_str = "";
+        var second_str = "";
+        if(hour < 10) {
+            hour_str = "0" + hour.toString();
+        } else {
+            hour_str = hour.toString();
+        }
+        if(minute < 10) {
+            minute_str = "0" + minute.toString();
+        } else {
+            minute_str = minute.toString();
+        }
+        if(seconds < 10) {
+            seconds_str = "0" + seconds.toString();
+        } else {
+            seconds_str = seconds.toString();
+        }
+        return hour_str + ":" + minute_str + ":" + seconds_str
+    }
 
     render() {
         return (
             <View style = {styles.container} onStartShouldSetResponder = {() => Keyboard.dismiss()}>
+            {
+                this.state.loading && <ProgressIndicator/>
+            }
                 <View style = {stylesGlobal.left_color_bar}>
                     <View style = {stylesGlobal.left_color_bar_first}/>
                     <View style = {stylesGlobal.left_color_bar_second}/>
@@ -71,12 +154,12 @@ export default class SummaryScreen extends Component {
                             <Text style = {[stylesGlobal.general_font_style, {fontSize: 24,}]}>GET READY FOR YOUR</Text>
                             <Text style = {[stylesGlobal.general_font_style, {fontSize: 24,}]}>FIRST MISSION</Text>
                         </View>
+                        <View style = {{width: '100%', marginTop: 15, alignItems: 'center', justifyContent: 'center', flexDirection: 'row'}}>
+                            <Image style = {{width: 25, height: 25, resizeMode: 'contain', tintColor: '#FED766'}} source = {require("../assets/images/mission_timer.png")}></Image>
+                            <Text style = {[stylesGlobal.general_font_style, {fontSize: 24, color: '#FED766', fontWeight: 'bold', marginLeft: 10}]}>{this.state.count_down_time}</Text>
+                        </View>
                     </View>
-                    <View style = {{width: '100%', height: 40, justifyContent: 'center', alignItems: 'center', marginBottom: isIphoneX ? 50 : 15}}>
-                        <TouchableOpacity style = {stylesGlobal.intro_button} onPress = {() => this.props.navigation.navigate("MissionFirstScreen")}>
-                            <Text style = {[stylesGlobal.general_font_style, {fontSize: 18, textAlign: 'center'}]}>NEXT</Text>
-                        </TouchableOpacity>
-                    </View>
+                    
                 </View>
             </View>
         );

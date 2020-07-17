@@ -13,6 +13,7 @@ import {
   View,
   Text,
   StatusBar,
+  I18nManager
 } from 'react-native';
 
 
@@ -21,10 +22,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import SignInScreen from './app/screens/SignInScreen';
+import CreateNameScreen from './app/screens/CreateNameScreen';
 import IntroFirstScreen from './app/screens/IntroFirstScreen';
 import IntroSecondScreen from './app/screens/IntroSecondScreen';
 import IntroThirdScreen from './app/screens/IntroThirdScreen';
-import SummaryScreen from './app/screens/SummaryScreen';
+import IntroSummaryScreen from './app/screens/IntroSummaryScreen';
 import MissionFirstScreen from './app/screens/MissionFirstScreen';
 import MissionSecondScreen from './app/screens/MissionSecondScreen';
 import MissionThirdScreen from './app/screens/MissionThirdScreen';
@@ -40,11 +42,17 @@ import ConclusionScreen from './app/screens/ConclusionScreen';
 
 const Stack = createStackNavigator();
 
+I18nManager.allowRTL(false);
+
 export default class App extends Component {
 
     constructor(props) {
         super(props);
         
+    }
+
+    UNSAFE_componentWillMount() {
+
     }
 
     render() {
@@ -58,10 +66,11 @@ export default class App extends Component {
                     headerMode="none"
                 >
                     <Stack.Screen name="SignInScreen" component={SignInScreen} />
+                    <Stack.Screen name="CreateNameScreen" component={CreateNameScreen} />
                     <Stack.Screen name="IntroFirstScreen" component={IntroFirstScreen} />
                     <Stack.Screen name="IntroSecondScreen" component={IntroSecondScreen} />
                     <Stack.Screen name="IntroThirdScreen" component={IntroThirdScreen} />
-                    <Stack.Screen name="SummaryScreen" component={SummaryScreen} />
+                    <Stack.Screen name="IntroSummaryScreen" component={IntroSummaryScreen} />
                     <Stack.Screen name="MissionFirstScreen" component={MissionFirstScreen} />
                     <Stack.Screen name="MissionSecondScreen" component={MissionSecondScreen} />
                     <Stack.Screen name="MissionThirdScreen" component={MissionThirdScreen} />

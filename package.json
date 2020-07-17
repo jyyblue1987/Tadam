@@ -15,14 +15,19 @@
     "@react-navigation/stack": "^5.5.1",
     "react": "16.11.0",
     "react-native": "0.62.2",
+    "react-native-cardview": "^2.0.5",
+    "react-native-fs": "^2.16.6",
     "react-native-gesture-handler": "^1.6.1",
     "react-native-image-picker": "^2.3.1",
+    "react-native-localization": "^2.1.6",
     "react-native-reanimated": "^1.9.0",
     "react-native-safe-area-context": "^3.0.5",
     "react-native-screens": "^2.8.0",
     "react-native-star-rating": "^1.1.0",
     "react-native-swiper": "^1.6.0",
-    "react-native-vector-icons": "^6.6.0"
+    "react-native-vector-icons": "^6.6.0",
+    "react-native-video": "^4.4.5",
+    "react-native-video-player": "^0.10.1"
   },
   "devDependencies": {
     "@babel/core": "^7.10.2",

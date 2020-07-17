@@ -56,7 +56,7 @@ export default class IntroThirdScreen extends Component {
                     <View style = {stylesGlobal.left_color_bar_fifth}/>
                 </View>
                 <View style = {styles.main_container}>
-                    <TouchableOpacity style = {styles.skip_button} onPress = {() => alert("sdfasdf")}>
+                    <TouchableOpacity style = {styles.skip_button} onPress = {() => this.props.navigation.navigate("IntroSummaryScreen")}>
                         <Text style = {stylesGlobal.general_font_style}>SKIP</Text>
                     </TouchableOpacity>
                     <View style = {{width: '100%', height: 150, alignItems: 'center', justifyContent: 'center'}}>
@@ -79,7 +79,7 @@ export default class IntroThirdScreen extends Component {
                         </View>
                     </View>
                     <View style = {{width: '100%', height: 40, justifyContent: 'center', alignItems: 'center', marginBottom: isIphoneX ? 50 : 15}}>
-                        <TouchableOpacity style = {stylesGlobal.intro_button} onPress = {() => this.props.navigation.navigate("SummaryScreen")}>
+                        <TouchableOpacity style = {stylesGlobal.intro_button} onPress = {() => this.props.navigation.navigate("IntroSummaryScreen")}>
                             <Text style = {[stylesGlobal.general_font_style, {fontSize: 18, textAlign: 'center'}]}>NEXT</Text>
                         </TouchableOpacity>
                     </View>

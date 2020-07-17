@@ -86,7 +86,8 @@ export const stylesGlobal = {
         height: '100%',
         borderRadius: 5,
         alignItems: 'center',
-        padding: 20,
+        padding: 20
+        
     },
     mission_avatar_image: {
         width: 40,

@@ -75,6 +75,7 @@
 		1C33C6D0B65F46E094E4321D /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
 		1EDE2CD6D694BE8AC3807C2D /* libPods-Tadam.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Tadam.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		218BA1CB5B53BF0401211C1A /* Pods-Tadam-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tadam-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-Tadam-tvOS/Pods-Tadam-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
+		232FAF19249DA38500E5AA52 /* he */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = he; path = he.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		283FB89386F1F25A9979F7FD /* Pods-Tadam.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tadam.release.xcconfig"; path = "Target Support Files/Pods-Tadam/Pods-Tadam.release.xcconfig"; sourceTree = "<group>"; };
 		29F331C51B7D497FAD751837 /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
 		2D02E47B1E0B4A5D006451C7 /* Tadam-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Tadam-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -369,6 +370,7 @@
 			knownRegions = (
 				en,
 				Base,
+				he,
 			);
 			mainGroup = 83CBB9F61A601CBA00E9B192;
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
@@ -708,6 +710,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				13B07FB21A68108700A75B9A /* Base */,
+				232FAF19249DA38500E5AA52 /* he */,
 			);
 			name = LaunchScreen.xib;
 			path = Tadam;

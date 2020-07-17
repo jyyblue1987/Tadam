@@ -28,6 +28,9 @@ import {
 } from 'react-native';
 
 import {stylesGlobal} from '../styles/stylesGlobal';
+import * as Global from "../Global/Global";
+import ProgressIndicator from "../components/ProgressIndicator";
+import ImagePicker from 'react-native-image-picker';
 
 const { width, height } = Dimensions.get("window");
 const isIos = Platform.OS === 'ios'
@@ -37,18 +40,262 @@ export default class MissionFirstScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            contents_text: 'Take a picture that fits the title: Coca Cola Taste of life or something like that, make sure the picture include one or more blue items',
+            loading: false,
+            question: "",
+            answerType: "",
+            numberOfPoints: 0,
+            count_down_time: "00:00:00",
+            disable_button: true,
+
+            image_uri: "",
+            video_uri: "",
+
+            text_Q_popup_show: false,
+            answer_text: "",
+            answer_text_temp: ""
         }
     }
 
-    UNSAFE_componentWillMount() {
+    UNSAFE_componentWillMount = async() => {
+        this.setState({
+            loading: true
+        })
         
+        var success = false;
+
+        await fetch(Global.BASE_URL + 'index.php/startgame/?gameAuthToken=' + Global.gameAuthToken, {
+            method: "GET",
+        })
+        .then(response => {
+            // const status_code = response.status;
+            // if(status_code == 200) {
+            //     success = true;
+            // } else {
+            //     success = false;
+            //     Alert.alert("Warning!", "Your game code is wrong. Please try again");
+            // }
+            return response.json();
+        })
+        .then(responseData => {
+            console.log("start game")
+            console.log(responseData)
+            if(responseData.success == true) {
+                success = true;
+            } else {
+                success = false;
+                var error_text = responseData.error_text;
+                if(error_text == null) {
+                    error_text = "";
+                }
+                Alert.alert("Warning!", error_text);
+            }
+        })
+        .catch(error => {
+            console.log(error)
+            success = false;
+            Alert.alert("Warning!", "Network error");
+        });
+
+        if(success) {
+            await fetch(Global.BASE_URL + 'index.php/question/?gameAuthToken=' + Global.gameAuthToken, {
+                method: "GET",
+            })
+            .then(response => {
+                return response.json();
+            })
+            .then(responseData => {
+                console.log("question")
+                console.log(responseData)
+                if(responseData.success) {
+                    this.setState({
+                        question: responseData.question,
+                        answerType: responseData.answerType,
+                        numberOfPoints: responseData.numberOfPoints,
+                    })
+                    if(responseData.questionEndTimestamp > Date.now() / 1000) {
+                        var difference_time = responseData.questionEndTimestamp - Math.floor(Date.now() / 1000);
+                        this.setState({
+                            count_down_time: this.format_time(difference_time)
+                        })
+                        this.timer = setInterval(() => {
+                            difference_time -= 1;
+                            this.setState({
+                                count_down_time: this.format_time(difference_time)
+                            })
+                            if(difference_time == 0) {
+                                clearInterval(this.timer);
+                                this.props.navigation.navigate("MissionSecondScreen");
+                            }
+                        }, 1000);
+                    } else {
+                        // this.props.navigation.navigate("MissionSecondScreen");
+                    }
+                } else {
+                    var error_text = responseData.error_text;
+                    if(error_text == null) {
+                        error_text = "";
+                    }
+                    Alert.alert("Warning!", error_text);
+                }
+            })
+            .catch(error => {
+                Alert.alert("Warning!", "Network error");
+            });
+        }
+        this.setState({
+            loading: false
+        })
+
     }
 
+    format_time(seconds_time) {
+        var hour = Math.floor(seconds_time / 3600);
+        var minute = Math.floor((seconds_time - 3600 * hour) / 60);
+        var seconds = seconds_time - 3600 * hour - 60 * minute;
+        var hour_str = "";
+        var minute_str = "";
+        var second_str = "";
+        if(hour < 10) {
+            hour_str = "0" + hour.toString();
+        } else {
+            hour_str = hour.toString();
+        }
+        if(minute < 10) {
+            minute_str = "0" + minute.toString();
+        } else {
+            minute_str = minute.toString();
+        }
+        if(seconds < 10) {
+            seconds_str = "0" + seconds.toString();
+        } else {
+            seconds_str = seconds.toString();
+        }
+        return hour_str + ":" + minute_str + ":" + seconds_str
+    }
+
+    answerAction = async() => {
+        if(this.state.answerType == "IMAGE") {
+            var options = {
+                title: 'Select Image',
+                mediaType: 'photo',
+                quality: 1.0,
+                allowsEditing: false,
+                noData: true,
+                storageOptions: {
+                    skipBackup: true,
+                    path: 'images'
+                }
+            };
+    
+            ImagePicker.showImagePicker(options, (response) => {
+    
+                if (response.didCancel) {
+                    console.log('User cancelled image picker');
+                } else if (response.error) {
+                    console.log('ImagePicker Error: ', response.error);
+                } else if (response.customButton) {
+                    console.log('User tapped custom button: ', response.customButton);
+                } else {
+                    this.setState({
+                        image_uri: response.uri,
+                        disable_button: false
+                    })
+                }
+            });
+        } else if(this.state.answerType == "VIDEO") {
+            const options = {
+                title: 'Video Picker',
+                takePhotoButtonTitle: 'Take Video...',
+                mediaType: 'video',
+                quality: 1.0,
+                // videoQuality: 'medium',
+                storageOptions:{
+                    skipBackup:true,
+                    path:'images'
+                }
+            };
+    
+            ImagePicker.showImagePicker(options, (response) => {
+                if (response.didCancel) {
+                    console.log('User cancelled video picker');
+                } else if (response.error) {
+                    console.log('ImagePicker Error: ', response.error);
+                } else if (response.customButton) {
+                    console.log('User tapped custom button: ', response.customButton);
+                } else {
+                    console.log(response.uri)
+                    this.setState({
+                        video_uri: response.uri,
+                        disable_button: false
+                    });
+                }
+            });
+        } else if(this.state.answerType == "TEXT") {
+            this.setState({
+                text_Q_popup_show: true
+            })
+        }
+    }
+
+    textAnswer = () => {
+        this.setState({
+            answer_text: this.state.answer_text_temp, 
+            text_Q_popup_show: false
+        })
+        if(this.state.answer_text_temp != "") {
+            this.setState({
+                disable_button: false
+            });
+        }
+    }
+
+    next_mission = async() => {
+        if(this.state.answerType == "IMAGE") {
+            this.props.navigation.navigate("PictureCheckScreen", {answerType: "IMAGE", image_uri: this.state.image_uri, mission: 'first'});
+        } else if(this.state.answerType == "VIDEO") {
+            this.props.navigation.navigate("PictureCheckScreen", {answerType: "VIDEO", video_uri: this.state.video_uri, mission: 'first'});
+        } else if(this.state.answerType == "TEXT") {
+            this.props.navigation.navigate("PictureCheckScreen", {answerType: "TEXT", answer_text: this.state.answer_text, mission: 'first'});
+        }
+        
+    }
 
     render() {
         return (
             <View style = {styles.container} onStartShouldSetResponder = {() => Keyboard.dismiss()}>
+            {
+                this.state.loading && <ProgressIndicator/>
+            }
+            {
+                this.state.text_Q_popup_show &&
+                <View style = {{width: '100%', height: '100%', position: "absolute", top: 0, left: 0, justifyContent: 'center', alignItems: 'center', zIndex: 10, elevation: 20}}>
+                    <View style = {{width: '100%', height: '100%', position: "absolute", top: 0, left: 0, backgroundColor: '#000000', opacity: 0.3}}/>
+                    <View style = {{width: '90%', backgroundColor: '#ffffff', borderRadius: 10}}>
+                        <View style = {{width: '100%', height: 50, justifyContent: 'center', alignItems: 'center',}}>
+                            <Text style = {[stylesGlobal.general_font_style, {fontSize: 18, textAlign: 'center', color: '#000000'}]}>Please input answer</Text>
+                        </View>
+                        <View style = {{width: '100%', height: 1, backgroundColor: '#000000'}}/>
+                        <View style = {{width: '100%', marginVertical: 10, alignItems: 'center'}}>
+                            <TextInput multiline = {true} style = {[stylesGlobal.general_font_style, {width: '90%', height: 150, borderColor: '#d0d0d0', borderWidth: 0.5, borderRadius: 5, padding: 5, fontSize: 14, color: '#000000'}]}
+                                onChangeText = {(text) => this.setState({answer_text_temp: text})}
+                            >{this.state.answer_text_temp}</TextInput>
+                        </View>
+                        <View style = {{width: '100%', height: 1, backgroundColor: '#000000'}}/>
+                        <View style = {{width: '100%', marginVertical: 10, flexDirection: 'row', justifyContent: 'center'}}>
+                            <View style = {{width: '40%', marginRight: 20}}>
+                                <TouchableOpacity style = {[stylesGlobal.mission_button, {borderColor: '#000000',}]} onPress = {() => this.setState({text_Q_popup_show: false})}>
+                                    <Text style = {[stylesGlobal.general_font_style, {fontSize: 16, textAlign: 'center', color: '#000000'}]}>CANCEL</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style = {{width: '40%'}}>
+                                <TouchableOpacity style = {[stylesGlobal.mission_button, {borderColor: '#000000',}]} onPress = {() => this.textAnswer()}>
+                                    <Text style = {[stylesGlobal.general_font_style, {fontSize: 16, textAlign: 'center', color: '#000000'}]}>OK</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </View>
+            }
                 <View style = {stylesGlobal.left_color_bar}>
                     <View style = {stylesGlobal.left_color_bar_first}/>
                     <View style = {stylesGlobal.left_color_bar_second}/>
@@ -67,23 +314,34 @@ export default class MissionFirstScreen extends Component {
                                     <Text style = {[stylesGlobal.general_font_style, {color: '#ffffff', marginLeft: 10}]}>BY HOVAV</Text>
                                 </View>
                                 <View style = {{flex: 2, width: '100%', alignItems: 'center', justifyContent: 'center'}}>
-                                    <TouchableOpacity style = {[stylesGlobal.mission_camera_container_view, {backgroundColor: '#3a95a7'}]}>
-                                        <Image style = {{width: '60%', height: '60%'}} source = {require("../assets/images/mission1_camera.png")}></Image>
+                                    <TouchableOpacity style = {[stylesGlobal.mission_camera_container_view, {backgroundColor: '#3a95a7'}]} onPress = {() => this.answerAction()}>
+                                    {
+                                        this.state.answerType == "IMAGE" &&
+                                        <Image style = {{width: '60%', height: '60%'}} source = {require("../assets/images/mission_camera.png")}></Image>
+                                    }
+                                    {
+                                        this.state.answerType == "VIDEO" &&
+                                        <Image style = {{width: '60%', height: '60%'}} source = {require("../assets/images/mission_video.png")}></Image>
+                                    }
+                                    {
+                                        this.state.answerType == "TEXT" &&
+                                        <Image style = {{width: '60%', height: '60%'}} source = {require("../assets/images/mission_doc.png")}></Image>
+                                    } 
                                     </TouchableOpacity>
                                 </View>
                                 <View style = {{flex: 3, width: '100%', alignItems: 'center', justifyContent: 'center'}}>
-                                    <Text style = {[stylesGlobal.general_font_style, {fontSize: 18, textAlign: 'center', color: '#ffffff'}]}>{this.state.contents_text}</Text>
+                                    <Text style = {[stylesGlobal.general_font_style, {fontSize: 18, textAlign: 'center', color: '#ffffff'}]}>{this.state.question}</Text>
                                 </View>
                                 <View style = {{flex: 1.5, width: '100%', alignItems: 'center', justifyContent: 'center', flexDirection: 'row'}}>
-                                    <Text style = {[stylesGlobal.general_font_style, {fontSize: 24, color: '#ffffff', fontWeight: 'bold'}]}>30</Text>
+                                    <Text style = {[stylesGlobal.general_font_style, {fontSize: 24, color: '#ffffff', fontWeight: 'bold'}]}>{this.state.numberOfPoints}</Text>
                                     <Image style = {{width: 35, height: 35, marginLeft: 10, resizeMode: 'contain'}} source = {require("../assets/images/mission1_coin.png")}></Image>
                                 </View>
                                 <View style = {{flex: 1.5, width: '100%', alignItems: 'center', justifyContent: 'center', flexDirection: 'row'}}>
                                     <Image style = {{width: 25, height: 25, resizeMode: 'contain'}} source = {require("../assets/images/mission_timer.png")}></Image>
-                                    <Text style = {[stylesGlobal.general_font_style, {fontSize: 24, color: '#ffffff', fontWeight: 'bold', marginLeft: 10}]}>00:10:25</Text>
+                                    <Text style = {[stylesGlobal.general_font_style, {fontSize: 24, color: '#ffffff', fontWeight: 'bold', marginLeft: 10}]}>{this.state.count_down_time}</Text>
                                 </View>
                                 <View style = {{flex: 1.5, width: '100%', alignItems: 'center', justifyContent: 'center'}}>
-                                    <TouchableOpacity style = {stylesGlobal.mission_button} onPress = {() => this.props.navigation.navigate("MissionSecondScreen")}>
+                                    <TouchableOpacity style = {stylesGlobal.mission_button} disabled = {this.state.disable_button} onPress = {() => this.next_mission()}>
                                         <Text style = {[stylesGlobal.general_font_style, {fontSize: 18, textAlign: 'center', color: '#ffffff'}]}>LET'S GO!</Text>
                                     </TouchableOpacity>
                                 </View>

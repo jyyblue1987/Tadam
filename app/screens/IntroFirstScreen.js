@@ -56,7 +56,7 @@ export default class IntroFirstScreen extends Component {
                     <View style = {stylesGlobal.left_color_bar_fifth}/>
                 </View>
                 <View style = {styles.main_container}>
-                    <TouchableOpacity style = {styles.skip_button}>
+                    <TouchableOpacity style = {styles.skip_button} onPress = {() => this.props.navigation.navigate("IntroSummaryScreen")}>
                         <Text style = {stylesGlobal.general_font_style}>SKIP</Text>
                     </TouchableOpacity>
                     <View style = {{width: '100%', height: 150, alignItems: 'center', justifyContent: 'center'}}>
