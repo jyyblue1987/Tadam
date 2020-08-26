@@ -32,6 +32,9 @@ import ImagePicker from 'react-native-image-picker';
 import * as Global from "../Global/Global";
 import {writeFile, readFile, readFileAssets, copyFile, readDir, exists, mkdir, unlink, DocumentDirectoryPath, DownloadDirectoryPath, LibraryDirectoryPath} from 'react-native-fs';
 import ProgressIndicator from "../components/ProgressIndicator";
+import KeepAwake from 'react-native-keep-awake';
+
+var RNFS = require('react-native-fs');
 
 import logoImage from '../assets/images/logo.png'
 
@@ -54,10 +57,20 @@ export default class CreateNameScreen extends Component {
             image_saved_path: DocumentDirectoryPath + Global.image_saved_path,
 
             new_image: false,
+
+            percentage_done: 0,
         }
     }
 
     UNSAFE_componentWillMount = async() => {
+
+        mkdir(DocumentDirectoryPath + Global.file_temp_path, null)
+            .then((res) => {
+                
+            })
+            .catch((error) => {
+
+            })
 
         var folder_exist = false;
         await exists(this.state.image_saved_path)
@@ -100,6 +113,7 @@ export default class CreateNameScreen extends Component {
             .catch((error) => {
 
             })
+            
         }
         
     }
@@ -131,12 +145,16 @@ export default class CreateNameScreen extends Component {
                     new_image: true
                 })
                 var name_image_array = this.state.name_image_array;
+                for(var i = 0; i < name_image_array.length; i ++) {
+                    name_image_array[i].selected = false
+                }
                 name_image_array.unshift({
                     file_url: response.uri,
-                    selected: true
+                    selected: true,
                 })
                 this.setState({
-                    name_image_array: name_image_array
+                    name_image_array: name_image_array,
+                    // name: ""
                 })
             }
         });
@@ -195,96 +213,152 @@ export default class CreateNameScreen extends Component {
             Alert.alert("Warning!", "Name or Nickname have to be at least 3 characters");
             return;
         }
-        // var letters = /^[0-9a-zA-Z ]+$/;
-        // if(!this.state.name.match(letters)) {
-        //     Alert.alert("Warning!", "Name or Nickname have to contain only digits and chracters");
-        //     return;
-        // }
-
+      
         var filename = Date.now()+ "___" + this.state.name.replace(" ", "---") + ".png";
 
-        let params = new FormData();
-        params.append("gameAuthToken", Global.gameAuthToken);
-        params.append("name", this.state.name);
         if(this.state.selected_image != "") {
-            params.append('image', {
-                uri: this.state.selected_image,
-                type: 'image/png',
-                name: filename + '.png'
-            });
-        }
-        console.log(params)
-        console.log(this.state.selected_image)
 
-        // if(Platform.OS == "ios") {
-        //     if(this.state.selected_image == "") {
-        //         const logoImageUri = Image.resolveAssetSource(logoImage).uri;
-        //         params.append('image', {
-        //             uri: logoImageUri,
-        //             type: 'image/png',
-        //             name: 'logo.png'
-        //         });
-        //     } else {
-        //         params.append('image', {
-        //             uri: this.state.selected_image,
-        //             type: 'image/png',
-        //             name: filename + '.png'
-        //         });
-        //     }
-        // } else if(Platform.OS == "android") {
-        //     if(this.state.selected_image == "") {
-        //         const logoImageUri = Image.resolveAssetSource(logoImage).uri;
-        //         await readFileAssets('logo.png', 'base64')
-        //         .then(res =>{
-        //             params.append('image', res);
-        //         });
-    
-        //     } else {
-        //         await readFile(this.state.selected_image, 'base64')
-        //         .then(res =>{
-        //             params.append('image', res);
-        //         });
-        //     }
-        // }
-        // console.log(JSON.stringify(params))
-        this.setState({
-            loading: true
-        })
-        await fetch(Global.BASE_URL + 'index.php/profile', {
-            method: "POST",
-            body: params
-        })
-        .then(response => {
-            return response.json();
-        })
-        .then(responseData => {
-            console.log(JSON.stringify(responseData))
-            if(responseData.success) {
-                Global.playerAuthToken = responseData.playerAuthToken;
-                Global.gamestart_time = responseData.gameStartTimestamp;
-                if(this.state.new_image) {
-                    copyFile(this.state.selected_image, DocumentDirectoryPath + Global.image_saved_path + filename)
-                    .then((res) => {
-                        this.props.navigation.navigate("IntroFirstScreen");
-                    })
-                    .catch((error) => {
-                        Alert.alert("Warning!", "Error occured. Please try again.");
-                    })
-                } else {
+            var uploadBegin = (response) => {
+                
+            };
+            
+            var uploadProgress = (response) => {
+                var percentage = Math.floor((response.totalBytesSent/response.totalBytesExpectedToSend) * 100);
+                this.setState({
+                    percentage_done: percentage
+                })
+                console.log('UPLOAD IS ' + percentage + '% DONE!');
+            };
+            
+            var files = [];
+            var filepath = "";
+            
+            if(this.state.new_image) {
+                await copyFile(this.state.selected_image, DocumentDirectoryPath + Global.image_saved_path + filename)
+                .then((res) => {
+                    filepath = DocumentDirectoryPath + Global.image_saved_path + filename;
+                })
+                .catch((error) => {
+                    Alert.alert("Warning!", "Error occured. Please try again.");
+                })
+            } else {
+                if(Platform.OS == "android") {
+                    filepath = this.state.selected_image.replace("file://", "");
+                }
+            }
+            
+            files = [
+                {
+                    name: "image",
+                    filename: filename + '.png',
+                    filepath: filepath,
+                    filetype: 'image/png'
+                }
+            ];
+            
+            this.setState({
+                loading: true
+            })
+
+            await RNFS.uploadFiles({
+                toUrl: Global.BASE_URL + 'index.php/profile',
+                files: files,
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                },
+                fields: {
+                    'gameAuthToken': Global.gameAuthToken,
+                    'name': this.state.name
+                },
+                begin: uploadBegin,
+                progress: uploadProgress
+            }).promise.then(response => {
+            if (response.statusCode == 200) {
+                var responseData = JSON.parse(response.body);
+                if(responseData.success) {
+                    Global.playerAuthToken = responseData.playerAuthToken;
+                    Global.gamestart_time = responseData.gameStartTimestamp;
+                    Global.game_image_path = this.state.selected_image;
+                    Global.game_name = this.state.name;
+
                     this.props.navigation.navigate("IntroFirstScreen");
+
+                } else {
+                    var error_text = responseData.error_text;
+                    if(error_text == null) {
+                        error_text = "";
+                    }
+                    Alert.alert("Warning!", error_text);
                 }
             } else {
-                var error_text = responseData.error_text;
-                if(error_text == null) {
-                    error_text = "";
-                }
-                Alert.alert("Warning!", error_text);
+                console.log('SERVER ERROR');
             }
-        })
-        .catch(error => {
-            console.log(error + " 00000 ")
-            Alert.alert("Warning!", "Network error");
-        });
+            })
+            // .then(responseData => {
+            //     console.log(JSON.stringify(responseData))
+            // })
+            .catch((err) => {
+                if(err.description === "cancelled") {
+                    // cancelled by user
+                }
+                console.log(err);
+            });
+        } else {
+
+            let params = new FormData();
+            params.append("gameAuthToken", Global.gameAuthToken);
+            params.append("name", this.state.name);
+            if(this.state.selected_image != "") {
+                params.append('image', {
+                    uri: this.state.selected_image,
+                    type: 'image/png',
+                    name: filename + '.png'
+                });
+            }
+
+            this.setState({
+                loading: true
+            })
+            await fetch(Global.BASE_URL + 'index.php/profile', {
+                method: "POST",
+                body: params
+            })
+            .then(response => {
+                return response.json();
+            })
+            .then(responseData => {
+                console.log(JSON.stringify(responseData))
+                if(responseData.success) {
+                    Global.playerAuthToken = responseData.playerAuthToken;
+                    Global.gamestart_time = responseData.gameStartTimestamp;
+                    Global.game_image_path = this.state.selected_image;
+                    Global.game_name = this.state.name;
+                    if(this.state.new_image) {
+                        copyFile(this.state.selected_image, DocumentDirectoryPath + Global.image_saved_path + filename)
+                        .then((res) => {
+                            
+                            this.props.navigation.navigate("IntroFirstScreen");
+                        })
+                        .catch((error) => {
+                            Alert.alert("Warning!", "Error occured. Please try again.");
+                        })
+                    } else {
+                        this.props.navigation.navigate("IntroFirstScreen");
+                    }
+                } else {
+                    var error_text = responseData.error_text;
+                    if(error_text == null) {
+                        error_text = "";
+                    }
+                    Alert.alert("Warning!", error_text);
+                }
+            })
+            .catch(error => {
+                console.log(error + " 00000 ")
+                Alert.alert("Warning!", "Network error");
+            });
+        }
         this.setState({
             loading: false
         })
@@ -294,7 +368,7 @@ export default class CreateNameScreen extends Component {
         return (
             <View style = {styles.container} onStartShouldSetResponder = {() => Keyboard.dismiss()}>
             {
-                this.state.loading && <ProgressIndicator/>
+                this.state.loading && <ProgressIndicator percentage = {this.state.percentage_done}/>
             }
                 <View style = {stylesGlobal.left_color_bar}>
                     <View style = {stylesGlobal.left_color_bar_first}/>
@@ -312,7 +386,7 @@ export default class CreateNameScreen extends Component {
                             <Text style = {[stylesGlobal.general_font_style, {fontSize: 20, color: '#2AB7CA'}]}>Player/Group Name</Text>
                             <View style = {styles.input_component}>
                                 {/* <Text style = {[stylesGlobal.general_font_style, {fontSize: 16}]}>Your name</Text> */}
-                                <TextInput style = {[styles.input_style, stylesGlobal.general_font_style]} placeholder = {"enter name or nickname"} onChangeText = {(text) => this.setState({name: text})}>{this.state.name}</TextInput>
+                                <TextInput style = {[styles.input_style, stylesGlobal.general_font_style]} placeholder = {"enter name or nickname"} onChangeText = {(text) => this.setState({name: text})} onSubmitEditing = {() => this.onContinue()}>{this.state.name}</TextInput>
                             </View>
                             <View style = {styles.input_component}>
                                 {/* <Text style = {[stylesGlobal.general_font_style, {fontSize: 16}]}>Game code</Text> */}
@@ -362,6 +436,7 @@ export default class CreateNameScreen extends Component {
                     </View>
                     
                 </KeyboardAvoidingView>
+                <KeepAwake />
             </View>
         );
     }

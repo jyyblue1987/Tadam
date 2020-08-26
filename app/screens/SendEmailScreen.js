@@ -29,6 +29,7 @@ import {
 
 import {stylesGlobal} from '../styles/stylesGlobal';
 import StarRating from 'react-native-star-rating';
+import KeepAwake from 'react-native-keep-awake';
 
 const { width, height } = Dimensions.get("window");
 const isIos = Platform.OS === 'ios'
@@ -87,6 +88,7 @@ export default class SendEmailScreen extends Component {
                         </View>
                     </View>
                 </KeyboardAvoidingView>
+                <KeepAwake />
             </View>
         );
     }

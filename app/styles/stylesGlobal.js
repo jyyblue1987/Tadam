@@ -92,7 +92,9 @@ export const stylesGlobal = {
     mission_avatar_image: {
         width: 40,
         height: 40,
-        resizeMode: 'contain'
+        resizeMode: 'cover',
+        borderRadius: 40,
+        overflow: 'hidden'
     },
     mission_camera_container_view: {
         width: 80,

@@ -29,12 +29,13 @@ import {
 
 import {stylesGlobal} from '../styles/stylesGlobal';
 import StarRating from 'react-native-star-rating';
+import KeepAwake from 'react-native-keep-awake';
 
 const { width, height } = Dimensions.get("window");
 const isIos = Platform.OS === 'ios'
 const isIphoneX = isIos && (Dimensions.get('window').height === 812 || Dimensions.get('window').height === 896);
 
-export default class YourRateScreen extends Component {
+export default class RateOthersSummaryScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -141,6 +142,7 @@ export default class YourRateScreen extends Component {
                         </TouchableOpacity>
                     </View>
                 </View>
+                <KeepAwake />
             </View>
         );
     }

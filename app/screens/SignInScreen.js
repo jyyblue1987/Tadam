@@ -30,6 +30,7 @@ import {stylesGlobal} from '../styles/stylesGlobal';
 import LocalizeString from '../assets/languages/strings';
 import * as Global from "../Global/Global";
 import ProgressIndicator from "../components/ProgressIndicator";
+import KeepAwake from 'react-native-keep-awake';
 
 const { width, height } = Dimensions.get("window");
 const isIos = Platform.OS === 'ios'
@@ -54,6 +55,8 @@ export default class SignInScreen extends Component {
     }
 
     onContinue = async() => {
+        // var other_game_members_data = [{"answer": "https://dev.edit.co.il/tadam/files/o9DnQjvwz24RgiEahxaY/5f28ca0b22b3c.mp3", "answerType": "AUDIO", "voteTargetAuthToken": "5f28c93e7796e"}, {"answer": "https://dev.edit.co.il/tadam/files/o9DnQjvwz24RgiEahxaY/5f28ca0b26100.mp3", "answerType": "AUDIO", "voteTargetAuthToken": "5f28c9409eccf"}, {"answer": "https://dev.edit.co.il/tadam/files/o9DnQjvwz24RgiEahxaY/5f28ca0b2812a.mp3", "answerType": "AUDIO", "voteTargetAuthToken": "5f28c942876bb"}]
+        // this.props.navigation.navigate("RateOthersScreen", {other_game_members_data: other_game_members_data, other_rating_timeLimit: 1596510000})
         Keyboard.dismiss()
         if(this.state.game_code.trim() == "") {
             Alert.alert("Warning!", "Please enter gmae code you got");
@@ -93,7 +96,6 @@ export default class SignInScreen extends Component {
         this.setState({
             loading: false
         })
-        
     }
 
     render() {
@@ -135,7 +137,7 @@ export default class SignInScreen extends Component {
                             </View> */}
                             <View style = {styles.input_component}>
                                 <Text style = {[stylesGlobal.general_font_style, {fontSize: 16}]}>Game code</Text>
-                                <TextInput style = {[styles.input_style, stylesGlobal.general_font_style]} placeholder = {"enter the code you got"} onChangeText = {(text) => this.setState({game_code: text})}></TextInput>
+                                <TextInput style = {[styles.input_style, stylesGlobal.general_font_style]} placeholder = {"enter the code you got"} onChangeText = {(text) => this.setState({game_code: text})} onSubmitEditing = {() => this.onContinue()}></TextInput>
                             </View>
                         </View>
                         <View style = {{width: '100%', alignItems: 'center', marginTop: 50}}>
@@ -152,6 +154,7 @@ export default class SignInScreen extends Component {
                     </View>
                 </KeyboardAvoidingView>
             }
+            <KeepAwake />
             </View>
         );
     }

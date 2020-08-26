@@ -27,15 +27,15 @@ import IntroFirstScreen from './app/screens/IntroFirstScreen';
 import IntroSecondScreen from './app/screens/IntroSecondScreen';
 import IntroThirdScreen from './app/screens/IntroThirdScreen';
 import IntroSummaryScreen from './app/screens/IntroSummaryScreen';
-import MissionFirstScreen from './app/screens/MissionFirstScreen';
+import MissionScreen from './app/screens/MissionScreen';
 import MissionSecondScreen from './app/screens/MissionSecondScreen';
 import MissionThirdScreen from './app/screens/MissionThirdScreen';
 import PictureCaptureScreen from './app/screens/PictureCaptureScreen';
 import PictureCheckScreen from './app/screens/PictureCheckScreen';
 import CreateSummaryScreen from './app/screens/CreateSummaryScreen';
-import RankIntroScreen from './app/screens/RankIntroScreen';
-import RankAnswerScreen from './app/screens/RankAnswerScreen';
-import YourRateScreen from './app/screens/YourRateScreen';
+import RateOthersIntroScreen from './app/screens/RateOthersIntroScreen';
+import RateOthersScreen from './app/screens/RateOthersScreen';
+import RateOthersSummaryScreen from './app/screens/RateOthersSummaryScreen';
 import YourRankScreen from './app/screens/YourRankScreen';
 import SendEmailScreen from './app/screens/SendEmailScreen';
 import ConclusionScreen from './app/screens/ConclusionScreen';
@@ -71,15 +71,15 @@ export default class App extends Component {
                     <Stack.Screen name="IntroSecondScreen" component={IntroSecondScreen} />
                     <Stack.Screen name="IntroThirdScreen" component={IntroThirdScreen} />
                     <Stack.Screen name="IntroSummaryScreen" component={IntroSummaryScreen} />
-                    <Stack.Screen name="MissionFirstScreen" component={MissionFirstScreen} />
+                    <Stack.Screen name="MissionScreen" component={MissionScreen} />
                     <Stack.Screen name="MissionSecondScreen" component={MissionSecondScreen} />
                     <Stack.Screen name="MissionThirdScreen" component={MissionThirdScreen} />
                     <Stack.Screen name="PictureCaptureScreen" component={PictureCaptureScreen} />
                     <Stack.Screen name="PictureCheckScreen" component={PictureCheckScreen} />
                     <Stack.Screen name="CreateSummaryScreen" component={CreateSummaryScreen} />
-                    <Stack.Screen name="RankIntroScreen" component={RankIntroScreen} />
-                    <Stack.Screen name="RankAnswerScreen" component={RankAnswerScreen} />
-                    <Stack.Screen name="YourRateScreen" component={YourRateScreen} />
+                    <Stack.Screen name="RateOthersIntroScreen" component={RateOthersIntroScreen} />
+                    <Stack.Screen name="RateOthersScreen" component={RateOthersScreen} />
+                    <Stack.Screen name="RateOthersSummaryScreen" component={RateOthersSummaryScreen} />
                     <Stack.Screen name="YourRankScreen" component={YourRankScreen} />
                     <Stack.Screen name="SendEmailScreen" component={SendEmailScreen} />
                     <Stack.Screen name="ConclusionScreen" component={ConclusionScreen} />

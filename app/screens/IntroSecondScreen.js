@@ -27,6 +27,7 @@ import {
 } from 'react-native';
 
 import {stylesGlobal} from '../styles/stylesGlobal';
+import KeepAwake from 'react-native-keep-awake';
 
 const { width, height } = Dimensions.get("window");
 const isIos = Platform.OS === 'ios'
@@ -84,6 +85,7 @@ export default class IntroSecondScreen extends Component {
                         </TouchableOpacity>
                     </View>
                 </View>
+                <KeepAwake />
             </View>
         );
     }

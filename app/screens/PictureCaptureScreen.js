@@ -29,6 +29,7 @@ import {
 
 import {stylesGlobal} from '../styles/stylesGlobal';
 import ImagePicker from 'react-native-image-picker';
+import KeepAwake from 'react-native-keep-awake';
 
 const { width, height } = Dimensions.get("window");
 const isIos = Platform.OS === 'ios'
@@ -96,6 +97,7 @@ export default class PictureCaptureScreen extends Component {
                         </TouchableOpacity>
                     </View>
                 </ImageBackground>
+                <KeepAwake />
             </View>
         );
     }

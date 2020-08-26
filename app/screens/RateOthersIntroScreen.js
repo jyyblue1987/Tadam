@@ -28,24 +28,115 @@ import {
 } from 'react-native';
 
 import {stylesGlobal} from '../styles/stylesGlobal';
+import ProgressIndicator from "../components/ProgressIndicator";
+import * as Global from "../Global/Global";
+import KeepAwake from 'react-native-keep-awake';
 
 const { width, height } = Dimensions.get("window");
 const isIos = Platform.OS === 'ios'
 const isIphoneX = isIos && (Dimensions.get('window').height === 812 || Dimensions.get('window').height === 896);
 
-export default class RankIntroScreen extends Component {
+export default class RateOthersIntroScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            loading: false,
             intro_text: "Before you proceed take the time and understand that this text is not realy saying anything at all.",
-            reminder_text: "Take a picture that fits the title: Coca Cola Taste of life or something like that, make sure the picture include one or more blue items"
+            reminder_text: "Take a picture that fits the title: Coca Cola Taste of life or something like that, make sure the picture include one or more blue items",
+            other_game_members_data: [],
+            other_rating_timeLimit: 0,
         }
     }
 
     UNSAFE_componentWillMount() {
-        
+        this.initListener = this.props.navigation.addListener('focus', this.init_data.bind(this));
     }
 
+    init_data = async() => {
+        this.setState({
+            loading: true
+        })
+
+        this.waiting_timer = setInterval(async() => {
+            await fetch(Global.BASE_URL + 'index.php/game/?gameAuthToken=' + Global.gameAuthToken, {
+                method: "GET",
+            })
+            .then(response => {
+                return response.json();
+            })
+            .then(responseData => {
+                if(responseData.success) {
+                    if(responseData.gameState == "rank") {
+                        clearInterval(this.waiting_timer);
+                        this.get_ranks();
+                    } else if(responseData.gameState == "completed") {
+                        clearInterval(this.waiting_timer);
+                        this.props.navigation.navigate("YourRankScreen");
+                    } else {
+                        
+                    }
+                } else {
+                    clearInterval(this.waiting_timer);
+                    this.setState({
+                        loading: false
+                    })
+                    var error_text = responseData.error_text;
+                    if(error_text == null) {
+                        error_text = "";
+                    }
+                    Alert.alert("Warning!", error_text);
+                }
+            })
+            .catch(error => {
+                console.log(error)
+                this.setState({
+                    loading: false
+                })
+                Alert.alert("Warning!", "Network error");
+            });
+        }, 5000)
+                
+    }
+
+    get_ranks = async() => {
+        await fetch(Global.BASE_URL + 'index.php/ranks?gameAuthToken=' + Global.gameAuthToken + '&playerAuthToken=' + Global.playerAuthToken, {
+            method: "GET",
+        })
+        .then(response => {
+            return response.json();
+        })
+        .then(responseData => {
+            console.log("rating intro screen")
+            console.log(responseData)
+            if(responseData.success) {
+                this.setState({
+                    other_game_members_data: responseData.ranks,
+                    other_rating_timeLimit: responseData.timeLimit
+                })
+            } else {
+                var error_text = responseData.error_text;
+                if(error_text == null) {
+                    error_text = "";
+                }
+                Alert.alert("Warning!", error_text);
+            }
+        })
+        .catch(error => {
+            console.log(error)
+            Alert.alert("Warning!", "Network error");
+        });
+        this.setState({
+            loading: false
+        })
+    }
+
+    componentWillUnmount = () => {
+        this.props.navigation.removeListener("focus");
+    }
+
+    rate_screen = () => {
+        this.props.navigation.navigate("RateOthersScreen", {other_game_members_data: this.state.other_game_members_data, other_rating_timeLimit: this.state.other_rating_timeLimit})
+    }
 
     render() {
         return (
@@ -61,7 +152,7 @@ export default class RankIntroScreen extends Component {
                     <ImageBackground style = {{width: '100%', height: '100%', resizeMode: 'cover',}} blurRadius={Platform.OS == 'ios' ? 20 : 5} source = {require("../assets/images/temp.png")}>
                         <View style = {{flex: 1, alignItems: 'center'}}>
                             <View style = {{width: '80%', alignItems: 'center', marginTop: isIphoneX ? 55 : 20}}>
-                                <Text style = {[stylesGlobal.general_font_style, {fontSize: 24, color: "#ffffff"}]}>NOW LET'S RANK OTHERS</Text>
+                                <Text style = {[stylesGlobal.general_font_style, {fontSize: 24, color: "#ffffff", textAlign: 'center'}]}>NOW LET'S RANK OTHERS</Text>
                                 <Text style = {[stylesGlobal.general_font_style, {marginTop: 10, fontSize: 18, textAlign: 'center', color: "#ffffff"}]}>{this.state.intro_text}</Text>
                             </View>
                             <View style = {{width: '100%', height: 200, alignItems: 'center', justifyContent: 'center'}}>
@@ -76,13 +167,18 @@ export default class RankIntroScreen extends Component {
                             </View>
                         </View>
                         <View style = {{width: '100%', height: 40, marginBottom: isIphoneX ? 45 : 20, justifyContent: 'center', alignItems: 'center'}}>
-                            <TouchableOpacity style = {{width: '80%', height: 40, borderRadius: 40, borderWidth: 1, borderColor: '#ffffff', justifyContent: 'center', alignItems: 'center'}}  onPress = {() => this.props.navigation.navigate("RankAnswerScreen")}>
+                            <TouchableOpacity style = {{width: '80%', height: 40, borderRadius: 40, borderWidth: 1, borderColor: '#ffffff', justifyContent: 'center', alignItems: 'center'}} 
+                                onPress = {() => this.rate_screen()}>
                                 <View style = {{width: '100%', height: 40, borderRadius: 40, opacity: 0.4, backgroundColor: '#000000', position: 'absolute', left: 0, top: 0}}/>
                                 <Text style = {[stylesGlobal.general_font_style, {fontSize: 18, color: '#2AB7CA'}]}>ALRIGHT!</Text>
                             </TouchableOpacity>
                         </View>
                     </ImageBackground>
                 </View>
+            {
+                this.state.loading && <ProgressIndicator/>
+            }
+                <KeepAwake />
             </View>
         );
     }
