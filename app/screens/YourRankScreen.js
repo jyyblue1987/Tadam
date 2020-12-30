@@ -24,7 +24,8 @@ import {
     KeyboardAvoidingView,
     TextInput,
     Keyboard,
-    ImageBackground
+    ImageBackground,
+    BackHandler
 } from 'react-native';
 
 import {stylesGlobal} from '../styles/stylesGlobal';
@@ -47,6 +48,7 @@ export default class YourRankScreen extends Component {
             score: 0,
             rank: 0,
             timeLimit: 0,
+            resultsSummary: "",
         }
 
         this._video = [];
@@ -54,6 +56,7 @@ export default class YourRankScreen extends Component {
     }
 
     UNSAFE_componentWillMount() {
+        BackHandler.addEventListener('hardwareBackPress', () => {return true});
         this.initListener = this.props.navigation.addListener('focus', this.init_data.bind(this));
     }
 
@@ -73,7 +76,8 @@ export default class YourRankScreen extends Component {
                     score: responseData.score,
                     rank: responseData.rank,
                     timeLimit: responseData.timeLimit,
-                    projects_array: responseData.results
+                    projects_array: responseData.results,
+                    resultsSummary: responseData.resultsSummary
                 }, () => {
                     var difference_time = this.state.timeLimit - Math.floor(Date.now() / 1000);
                     if(difference_time <= 0) {
@@ -236,12 +240,12 @@ export default class YourRankScreen extends Component {
                                 <View style = {{width: 1, height: '60%', backgroundColor: '#000000'}}/>
                                 <View style = {{width: 100, alignItems: 'center', justifyContent: 'center'}}>
                                     <Image style = {{width: '100%', height: 40, resizeMode: 'contain'}} source = {require("../assets/images/barchart_icon.png")}></Image>
-                                    <Text style = {[stylesGlobal.general_font_style, {fontSize: 12, color: '#000000', marginTop: 5}]}>Total Score:</Text>
+                                    <Text style = {[stylesGlobal.general_font_style, {fontSize: 12, color: '#000000', marginTop: 5}]}>Current Rank:</Text>
                                     <Text style = {[stylesGlobal.general_font_style, {fontSize: 24, color: '#000000'}]}>{this.state.rank}</Text>
                                 </View>
                             </View>
                             <View style = {{width: '100%', justifyContent: 'center', alignItems: 'center', marginTop: 20}}>
-                                <Text style = {[stylesGlobal.general_font_style, {fontSize: 14, color: '#000000'}]}>10 more points to get to level 31</Text>
+                                <Text style = {[stylesGlobal.general_font_style, {fontSize: 14, color: '#000000'}]}>{this.state.resultsSummary}</Text>
                                 <Text style = {[stylesGlobal.general_font_style, {fontSize: 16, color: '#2AB7CA', marginTop: 5}]}>Get ready for your next mission</Text>
                             </View>
                             <View style = {{width: '100%', justifyContent: 'center', alignItems: 'center', marginTop: 20}}>

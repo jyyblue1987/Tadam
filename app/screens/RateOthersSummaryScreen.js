@@ -24,12 +24,15 @@ import {
     KeyboardAvoidingView,
     TextInput,
     Keyboard,
-    ImageBackground
+    ImageBackground,
+    BackHandler
 } from 'react-native';
 
 import {stylesGlobal} from '../styles/stylesGlobal';
 import StarRating from 'react-native-star-rating';
 import KeepAwake from 'react-native-keep-awake';
+import ProgressIndicator from "../components/ProgressIndicator";
+import * as Global from "../Global/Global";
 
 const { width, height } = Dimensions.get("window");
 const isIos = Platform.OS === 'ios'
@@ -44,6 +47,42 @@ export default class RateOthersSummaryScreen extends Component {
     }
 
     UNSAFE_componentWillMount() {
+        BackHandler.addEventListener('hardwareBackPress', () => {return true});
+        this.initListener = this.props.navigation.addListener('focus', this.init_data.bind(this));
+
+        
+    }
+
+    init_data = async() => {
+        await fetch(Global.BASE_URL + 'index.php/summary/?gameAuthToken=' + Global.gameAuthToken + '&playerAuthToken=' + Global.playerAuthToken, {
+            method: "GET",
+        })
+        .then(response => {
+            return response.json();
+        })
+        .then(responseData => {
+            console.log("summary")
+            console.log(responseData)
+            if(responseData.success) {
+                
+            } else {
+                var error_text = responseData.error_text;
+                if(error_text == null) {
+                    error_text = "";
+                }
+                Alert.alert("Warning!", error_text);
+            }
+        })
+        .catch(error => {
+            Alert.alert("Warning!", "Network error");
+        });
+        this.setState({
+            loading: false
+        })
+    }
+
+
+    get_result = async() => {
         
     }
 

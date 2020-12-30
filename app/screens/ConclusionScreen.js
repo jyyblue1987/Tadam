@@ -24,7 +24,8 @@ import {
     KeyboardAvoidingView,
     TextInput,
     Keyboard,
-    ImageBackground
+    ImageBackground,
+    BackHandler
 } from 'react-native';
 
 import {stylesGlobal} from '../styles/stylesGlobal';
@@ -39,12 +40,12 @@ export default class ConclusionScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            contents_text: "Enter your email and we'll send you your creations",
+            contents_text: "We hope you enjoyed the game.\nSee you next time.",
         }
     }
 
     UNSAFE_componentWillMount() {
-        
+        BackHandler.addEventListener('hardwareBackPress', () => {return true});
     }
 
 
@@ -62,7 +63,7 @@ export default class ConclusionScreen extends Component {
                     <View style = {{width: '100%', height: 60,}}>
                         <Image style = {{width: '100%', height: '100%', resizeMode: 'contain'}} source = {require("../assets/images/rainbow_half.png")}></Image>
                     </View>
-                    <View style = {{width: '60%', justifyContent: 'center', alignItems: 'center', marginVertical: 30}}>
+                    <View style = {{width: '100%', justifyContent: 'center', alignItems: 'center', marginVertical: 30}}>
                         <Text style = {[stylesGlobal.general_font_style, {fontSize: 18, textAlign: 'center', color: '#808080'}]}>{this.state.contents_text}</Text>
                     </View>
                     <View style = {{width: '100%', height: 40, marginTop: 50, justifyContent: 'center', alignItems: 'center'}}>

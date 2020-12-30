@@ -25,7 +25,9 @@ import {
     TextInput,
     Keyboard,
     ImageBackground,
-    FlatList
+    FlatList,
+    BackHandler,
+    I18nManager
 } from 'react-native';
 
 import {stylesGlobal} from '../styles/stylesGlobal';
@@ -36,6 +38,11 @@ import VideoPlayer from 'react-native-video-player';
 import * as Global from "../Global/Global";
 import {format_time} from '../utils/utils';
 import KeepAwake from 'react-native-keep-awake';
+import { RotationGestureHandler } from 'react-native-gesture-handler';
+
+import logoImage from '../assets/images/logo.png';
+
+const logoImageUri = Image.resolveAssetSource(logoImage).uri;
 
 const { width, height } = Dimensions.get("window");
 const isIos = Platform.OS === 'ios'
@@ -64,6 +71,7 @@ export default class RateOthersScreen extends Component {
     }
 
     UNSAFE_componentWillMount() {
+        BackHandler.addEventListener('hardwareBackPress', () => {return true});
         this.initListener = this.props.navigation.addListener('focus', this.init_data.bind(this));
     }
 
@@ -77,7 +85,8 @@ export default class RateOthersScreen extends Component {
                 this.game_state();
                 return;
             }
-            var other_game_members_data = this.props.route.params.other_game_members_data;
+            var other_game_members_data = [];
+            other_game_members_data = this.props.route.params.other_game_members_data;
             if(other_game_members_data == null) {
                 Alert.alert("Warning!", "error occured in ranks");
                 return;
@@ -91,11 +100,16 @@ export default class RateOthersScreen extends Component {
             
             console.log("rating screen//////////////")
             console.log("server response timelimit:" + this.props.route.params.other_rating_timeLimit + "    " + "current time:" + Date.now() / 1000)
+            // if(I18nManager.isRTL) {
+            //     other_game_members_data = other_game_members_data.reverse();
+            // }
+            
             if(difference_time <= 0) {
                 this.setState({
                     other_game_members_data: other_game_members_data,
                 })
             } else {
+                
                 this.setState({
                     other_game_members_data: other_game_members_data,
                     count_down_time: format_time(difference_time)
@@ -129,53 +143,43 @@ export default class RateOthersScreen extends Component {
 
     onStarRatingPress = async(index, rating) => {
         var other_game_members_data = this.state.other_game_members_data;
-        var total_rating = 0;
-        for(var i = 0; i < other_game_members_data.length; i ++) {
-            total_rating += other_game_members_data[i].rating;
-        }
-        if(total_rating + rating > 10) {
-            Alert.alert("Warning!", "All rating scores sum have to be equal to 10");
-            return;
-        }
+        // var total_rating = 0;
+        // for(var i = 0; i < other_game_members_data.length; i ++) {
+        //     total_rating += other_game_members_data[i].rating;
+        // }
+        // if(total_rating + rating > 10) {
+        //     Alert.alert("Warning!", "All rating scores sum have to be equal to 10");
+        //     return;
+        // }
         
-        if(total_rating + rating == 10) {
-            for(var i = 0; i < other_game_members_data.length; i ++) {
-                other_game_members_data[i].rate_disable = true;
-            }
-        }
+        // if(total_rating + rating == 10) {
+        //     for(var i = 0; i < other_game_members_data.length; i ++) {
+        //         other_game_members_data[i].rate_disable = true;
+        //     }
+        // }
 
-        var rated_answer_count = 0
-        for(var i = 0; i < other_game_members_data.length; i ++) {
-            if(other_game_members_data[i].rating > 0) {
-                rated_answer_count ++;
-            }
-        }
-        console.log("rated answer count:::" + rated_answer_count + "  " + (other_game_members_data.length - 1))
-        if(rated_answer_count == other_game_members_data.length - 2) {  /// last item is for summany(empty) so minus 2 for checking last item
-            if(this.state.remain_rating_star > 5 && rating != 5) {
-                Alert.alert("Warning!", "You have to rated with 5");
-                return;
-            }
-            if(this.state.remain_rating_star <= 5 &&this.state.remain_rating_star != rating) {
-                Alert.alert("Warning!", "All rating scores sum have to be equal to 10. You have to rated with " + this.state.remain_rating_star);
-                return;
-            }
-        }
+        
         
         other_game_members_data[index].rating = rating;
-        other_game_members_data[index].rate_disable = true;
+        // other_game_members_data[index].rate_disable = true;
         this.setState({
             other_game_members_data: other_game_members_data,
-            remain_rating_star: this.state.remain_rating_star - rating
+            // remain_rating_star: this.state.remain_rating_star - rating
         })
 
+        this.send_rating(index, rating);
+        
+    }
+
+    send_rating = async(index, rating) => {
+        var other_game_members_data = this.state.other_game_members_data;
         this.setState({
             loading: true
         })
         let params = new FormData();
         params.append("gameAuthToken", Global.gameAuthToken);
         params.append("playerAuthToken", Global.playerAuthToken);
-        params.append("voteTargetAuthToken ", other_game_members_data[index].voteTargetAuthToken);
+        params.append("voteTargetAuthToken", other_game_members_data[index].voteTargetAuthToken);
         params.append("score", rating);
                 
         await fetch(Global.BASE_URL + 'index.php/rank', {
@@ -186,8 +190,21 @@ export default class RateOthersScreen extends Component {
             return response.json();
         })
         .then(responseData => {
+            console.log(responseData)
             if(responseData.success) {
-                this.refs.swiperview.scrollBy(1, true)
+                this.refs.swiperview.scrollBy(1, true);
+
+                // var rated_answer_count = 0
+                // for(var i = 0; i < this.state.other_game_members_data.length; i ++) {
+                //     if(this.state.other_game_members_data[i].rating > 0) {
+                //         rated_answer_count ++;
+                //     }
+                // }
+                
+                // if(rated_answer_count == this.state.other_game_members_data.length - 2) {  /// last item is for summany(empty) so minus 2 for checking last item
+                //     console.log(this.state.remain_rating_star);
+                //     this.onStarRatingPress(this.state.other_game_members_data.length - 2, this.state.remain_rating_star);
+                // }
             } else {
                 var error_text = responseData.error_text;
                 if(error_text == null) {
@@ -206,6 +223,7 @@ export default class RateOthersScreen extends Component {
     }
 
     game_state = async() => {
+
         this.setState({
             loading: true
         })
@@ -228,14 +246,13 @@ export default class RateOthersScreen extends Component {
                             loading: false
                         })
                         this.props.navigation.navigate("YourRankScreen");
+                    } else if(responseData.gameState == "completed") {
+                        clearInterval(this.waiting_timer);
+                        this.setState({
+                            loading: false
+                        })
+                        this.props.navigation.navigate("SendEmailScreen");
                     } 
-                    // else if(responseData.gameState == "completed") {
-                    //     clearInterval(this.waiting_timer);
-                    //     this.setState({
-                    //         loading: false
-                    //     })
-                    //     this.props.navigation.navigate("YourRankScreen");
-                    // } 
                     else {
                         this.setState({
                             count_down_time: "Waiting..."
@@ -319,13 +336,13 @@ export default class RateOthersScreen extends Component {
                                     // videoWidth={height * 0.7}
                                     // videoHeight={height * 0.7}
                                     disableFullscreen
-                                    autoplay = {true}
+                                    autoplay = {false}
                                     pauseOnPress = {true}
                                     video={{uri: item.answer}}
                                     // resizeMode='cover'
                                     onLoad={() => {
-                                        this._video[index].seek(0);
-                                        this._video[index].pause();
+                                        // this._video[index].seek(0);
+                                        // this._video[index].pause();
                                     }}
                                     onPlayPress={() => {
                                         this._video[index].resume();
@@ -344,7 +361,7 @@ export default class RateOthersScreen extends Component {
                                         // videoWidth={height * 0.7}
                                         // videoHeight={height * 0.7}
                                         disableFullscreen
-                                        autoplay = {true}
+                                        autoplay = {false}
                                         pauseOnPress = {true}
                                         video={{uri: item.answer}}
                                         // resizeMode='cover'
@@ -400,6 +417,8 @@ export default class RateOthersScreen extends Component {
                     ref = "swiperview"
                     loop = {false} 
                     dot = {<View style={{width: 0, height: 0,}}/>} activeDot = {<View style={{width: 0, height: 0,}}/>}
+                    scrollEnabled = {false}
+                    // style = {{flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row'}}
                 >
                 {
                     this.state.other_game_members_data.map((item, index) =>
@@ -421,19 +440,21 @@ export default class RateOthersScreen extends Component {
                                             // videoWidth={height * 0.7}
                                             // videoHeight={height * 0.7}
                                             disableFullscreen
-                                            autoplay = {true}
+                                            autoplay = {false}
                                             pauseOnPress = {true}
                                             video={{uri: item.answer}}
+                                            // video={{uri: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'}}
                                             // resizeMode='cover'
                                             onLoad={() => {
-                                                this._videoBig[index].seek(0);
-                                                this._videoBig[index].pause();
+                                                // this._videoBig[index].seek(0);
+                                                // this._videoBig[index].pause();
                                             }}
                                             onPlayPress={() => {
                                                 this._videoBig[index].resume();
                                             }}
                                             style = {{width: '100%', height: '100%'}}
                                             thumbnail = {require("../assets/images/logo.png")}
+                                            // thumbnail = {{url: "https://www1.villanova.edu/content/villanova/fmo/ehs/msds/_jcr_content/pagecontent/image.img.png/1486409925119.png"}}
                                         />
                                     </View>
                                 }
@@ -454,7 +475,7 @@ export default class RateOthersScreen extends Component {
                                             // videoWidth={height * 0.7}
                                             // videoHeight={height * 0.7}
                                             disableFullscreen
-                                            autoplay = {true}
+                                            autoplay = {false}
                                             pauseOnPress = {true}
                                             video={{uri: item.answer}}
                                             // resizeMode='cover'
@@ -490,13 +511,13 @@ export default class RateOthersScreen extends Component {
                                             this.state.other_game_members_data.map((subitem, subindex) =>
                                             <View key = {subindex}>
                                             {
-                                                subindex == index &&
+                                                subindex == index && subindex != this.state.other_game_members_data.length - 1 &&
                                                 <View style = {{width: 40, height: 40, marginLeft: 15, justifyContent: 'center', alignItems: 'center', borderRadius: 40, backgroundColor: index % 3 == 0 ? '#2AB7CA' : index % 3 == 1 ? '#FE4A49' : '#FED766'}}>
                                                     <Text style = {[stylesGlobal.general_font_style, {color: '#ffffff', fontSize: 30, fontWeight: 'bold'}]}>{index + 1}</Text>
                                                 </View>
                                             }
                                             {
-                                                subindex != index &&
+                                                subindex != index && subindex != this.state.other_game_members_data.length - 1 &&
                                                 <View style = {[styles.dot_style, {marginLeft: 15}]}/>
                                             }
                                             </View>

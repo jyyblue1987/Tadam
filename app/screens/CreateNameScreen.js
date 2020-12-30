@@ -23,7 +23,8 @@ import {
     TouchableOpacity,
     KeyboardAvoidingView,
     TextInput,
-    Keyboard
+    Keyboard,
+    BackHandler
 } from 'react-native';
 
 import {stylesGlobal} from '../styles/stylesGlobal';
@@ -33,6 +34,7 @@ import * as Global from "../Global/Global";
 import {writeFile, readFile, readFileAssets, copyFile, readDir, exists, mkdir, unlink, DocumentDirectoryPath, DownloadDirectoryPath, LibraryDirectoryPath} from 'react-native-fs';
 import ProgressIndicator from "../components/ProgressIndicator";
 import KeepAwake from 'react-native-keep-awake';
+import base64 from 'react-native-base64'
 
 var RNFS = require('react-native-fs');
 
@@ -63,6 +65,8 @@ export default class CreateNameScreen extends Component {
     }
 
     UNSAFE_componentWillMount = async() => {
+
+        BackHandler.addEventListener('hardwareBackPress', () => {return true});
 
         mkdir(DocumentDirectoryPath + Global.file_temp_path, null)
             .then((res) => {
@@ -250,7 +254,7 @@ export default class CreateNameScreen extends Component {
             files = [
                 {
                     name: "image",
-                    filename: filename + '.png',
+                    filename: filename,
                     filepath: filepath,
                     filetype: 'image/png'
                 }
@@ -261,54 +265,51 @@ export default class CreateNameScreen extends Component {
             })
 
             await RNFS.uploadFiles({
-                toUrl: Global.BASE_URL + 'index.php/profile',
+                toUrl: Global.BASE_URL + 'index.php/profileImage',
                 files: files,
                 method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                },
                 fields: {
                     'gameAuthToken': Global.gameAuthToken,
-                    'name': this.state.name
+                    // 'name': base64.encode(this.state.name)
                 },
                 begin: uploadBegin,
                 progress: uploadProgress
             }).promise.then(response => {
-            if (response.statusCode == 200) {
-                var responseData = JSON.parse(response.body);
-                if(responseData.success) {
-                    Global.playerAuthToken = responseData.playerAuthToken;
-                    Global.gamestart_time = responseData.gameStartTimestamp;
-                    Global.game_image_path = this.state.selected_image;
-                    Global.game_name = this.state.name;
+                console.log(response);
+                if (response.statusCode == 200) {
+                    var responseData = JSON.parse(response.body);
+                    
+                    if(responseData.success) {
+                        this.send_profile_name(responseData.profileImage);
+                        // Global.playerAuthToken = responseData.playerAuthToken;
+                        // Global.gamestart_time = responseData.gameStartTimestamp;
+                        // Global.game_image_path = this.state.selected_image;
+                        // Global.game_name = this.state.name;
 
-                    this.props.navigation.navigate("IntroFirstScreen");
+                        // this.props.navigation.navigate("IntroFirstScreen");
 
-                } else {
-                    var error_text = responseData.error_text;
-                    if(error_text == null) {
-                        error_text = "";
+                    } else {
+                        var error_text = responseData.error_text;
+                        if(error_text == null) {
+                            error_text = "";
+                        }
+                        Alert.alert("Warning!", error_text);
                     }
-                    Alert.alert("Warning!", error_text);
+                } else {
+                    console.log('SERVER ERROR');
                 }
-            } else {
-                console.log('SERVER ERROR');
-            }
             })
-            // .then(responseData => {
-            //     console.log(JSON.stringify(responseData))
-            // })
             .catch((err) => {
                 if(err.description === "cancelled") {
                     // cancelled by user
                 }
-                console.log(err);
+                console.log("1111111" + err);
             });
         } else {
 
             let params = new FormData();
             params.append("gameAuthToken", Global.gameAuthToken);
-            params.append("name", this.state.name);
+            params.append("name", base64.encode(this.state.name));
             if(this.state.selected_image != "") {
                 params.append('image', {
                     uri: this.state.selected_image,
@@ -322,13 +323,14 @@ export default class CreateNameScreen extends Component {
             })
             await fetch(Global.BASE_URL + 'index.php/profile', {
                 method: "POST",
-                body: params
+                header: {'Content-Type': 'text/html; charset=UTF-8'},
+                body: params,
             })
             .then(response => {
                 return response.json();
             })
             .then(responseData => {
-                console.log(JSON.stringify(responseData))
+                console.log(responseData);
                 if(responseData.success) {
                     Global.playerAuthToken = responseData.playerAuthToken;
                     Global.gamestart_time = responseData.gameStartTimestamp;
@@ -347,6 +349,7 @@ export default class CreateNameScreen extends Component {
                         this.props.navigation.navigate("IntroFirstScreen");
                     }
                 } else {
+                    
                     var error_text = responseData.error_text;
                     if(error_text == null) {
                         error_text = "";
@@ -362,6 +365,44 @@ export default class CreateNameScreen extends Component {
         this.setState({
             loading: false
         })
+    }
+
+    send_profile_name = async(image_name) => {
+        let params = new FormData();
+        params.append("gameAuthToken", Global.gameAuthToken);
+        params.append("name", this.state.name);
+        params.append("image", image_name);
+        
+        await fetch(Global.BASE_URL + 'index.php/profile', {
+            method: "POST",
+            header: {'Content-Type': 'text/html; charset=UTF-8'},
+            body: params,
+        })
+        .then(response => {
+            return response.json();
+        })
+        .then(responseData => {
+            console.log(responseData);
+            if(responseData.success) {
+                Global.playerAuthToken = responseData.playerAuthToken;
+                Global.gamestart_time = responseData.gameStartTimestamp;
+                Global.game_image_path = this.state.selected_image;
+                Global.game_name = this.state.name;
+
+                this.props.navigation.navigate("IntroFirstScreen");
+            } else {
+                
+                var error_text = responseData.error_text;
+                if(error_text == null) {
+                    error_text = "";
+                }
+                Alert.alert("Warning!", error_text);
+            }
+        })
+        .catch(error => {
+            console.log(error + " 00000 ")
+            Alert.alert("Warning!", "Network error");
+        });
     }
 
     render() {

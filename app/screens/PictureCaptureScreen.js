@@ -24,7 +24,8 @@ import {
     KeyboardAvoidingView,
     TextInput,
     Keyboard,
-    ImageBackground
+    ImageBackground,
+    BackHandler
 } from 'react-native';
 
 import {stylesGlobal} from '../styles/stylesGlobal';
@@ -44,7 +45,7 @@ export default class PictureCaptureScreen extends Component {
     }
 
     UNSAFE_componentWillMount() {
-        
+        BackHandler.addEventListener('hardwareBackPress', () => {return true});
     }
 
     showImagePicker = () => {

@@ -23,7 +23,8 @@ import {
     TouchableOpacity,
     KeyboardAvoidingView,
     TextInput,
-    Keyboard
+    Keyboard,
+    BackHandler
 } from 'react-native';
 
 import {stylesGlobal} from '../styles/stylesGlobal';
@@ -42,7 +43,7 @@ export default class IntroThirdScreen extends Component {
     }
 
     UNSAFE_componentWillMount() {
-        
+        BackHandler.addEventListener('hardwareBackPress', () => {return true});
     }
 
 

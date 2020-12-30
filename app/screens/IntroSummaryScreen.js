@@ -24,7 +24,8 @@ import {
     KeyboardAvoidingView,
     TextInput,
     Keyboard,
-    ImageBackground
+    ImageBackground,
+    BackHandler
 } from 'react-native';
 
 import {stylesGlobal} from '../styles/stylesGlobal';
@@ -43,17 +44,20 @@ export default class IntroSummaryScreen extends Component {
         this.state = {
             loading: false,
             contents_text: 'Today we will invistigate the use of symbols but from a different angle We are waiting to see your take on the mission',
-            count_down_time: "00:00:00",
-            game_manager_image_path: "",
+            count_down_time: "Waiting...",
+            game_manager_image_path: Global.game_manager_image_path,
+            gameInstructions: Global.gameInstructions,
         }
     }
 
     UNSAFE_componentWillMount = async() => {
+
+        BackHandler.addEventListener('hardwareBackPress', () => {return true});
         
-        this.setState({
+        // this.setState({
             
-            loading: true
-        })
+        //     loading: true
+        // })
 
         this.waiting_timer = setInterval(async() => {
             await fetch(Global.BASE_URL + 'index.php/game/?gameAuthToken=' + Global.gameAuthToken, {
@@ -72,6 +76,9 @@ export default class IntroSummaryScreen extends Component {
                             game_manager_image_path: responseData.gameManagerProfileImage
                         })
                     }
+                    this.setState({
+                        gameInstructions: responseData.gameInstructions
+                    })
                     if(responseData.gameState == "question") {
                         clearInterval(this.waiting_timer);
 
@@ -96,12 +103,18 @@ export default class IntroSummaryScreen extends Component {
                                 }
                             }, 1000);
                         }
-                    } else if(responseData.gameState == "completed") {
+                    } else if(responseData.gameState == "results") {
                         clearInterval(this.waiting_timer);
                         this.setState({
                             loading: false
                         })
                         this.props.navigation.navigate("YourRankScreen");
+                    }else if(responseData.gameState == "completed") {
+                        clearInterval(this.waiting_timer);
+                        this.setState({
+                            loading: false
+                        })
+                        this.props.navigation.navigate("SendEmailScreen");
                     } else if(responseData.gameState == "rank") {
                         clearInterval(this.waiting_timer);
                         this.setState({
@@ -110,7 +123,8 @@ export default class IntroSummaryScreen extends Component {
                         this.props.navigation.navigate("RateOthersIntroScreen");
                     } else {
                         this.setState({
-                            count_down_time: "Waiting..."
+                            count_down_time: "Waiting...",
+                            loading: false
                         })
                     }
                     
@@ -139,9 +153,9 @@ export default class IntroSummaryScreen extends Component {
     }
 
     get_question = async() => {
-        this.setState({
-            loading: true
-        })
+        // this.setState({
+        //     loading: true
+        // })
         
         var success = false;
 
@@ -259,7 +273,7 @@ export default class IntroSummaryScreen extends Component {
                         <View style = {{width: '90%', height: 150,}}>
                             <ImageBackground style = {{width: '100%', height: '100%' }} resizeMode = {'stretch'} source = {require("../assets/images/summary_message_container.png")}>
                                 <View style = {{width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20}}>
-                                    <Text style = {[stylesGlobal.general_font_style, {fontSize: 18, textAlign: 'center', color: '#7A7A7A'}]}>{this.state.contents_text}</Text>
+                                    <Text style = {[stylesGlobal.general_font_style, {fontSize: 18, textAlign: 'center', color: '#7A7A7A'}]}>{this.state.gameInstructions}</Text>
                                 </View>
                             </ImageBackground>
                         </View>

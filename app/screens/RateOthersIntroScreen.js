@@ -24,7 +24,8 @@ import {
     KeyboardAvoidingView,
     TextInput,
     Keyboard,
-    ImageBackground
+    ImageBackground,
+    BackHandler,
 } from 'react-native';
 
 import {stylesGlobal} from '../styles/stylesGlobal';
@@ -49,6 +50,7 @@ export default class RateOthersIntroScreen extends Component {
     }
 
     UNSAFE_componentWillMount() {
+        BackHandler.addEventListener('hardwareBackPress', () => {return true});
         this.initListener = this.props.navigation.addListener('focus', this.init_data.bind(this));
     }
 

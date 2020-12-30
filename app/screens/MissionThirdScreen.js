@@ -24,7 +24,8 @@ import {
     KeyboardAvoidingView,
     TextInput,
     Keyboard,
-    ImageBackground
+    ImageBackground,
+    BackHandler
 } from 'react-native';
 
 import {stylesGlobal} from '../styles/stylesGlobal';
@@ -57,6 +58,7 @@ export default class MissionThirdScreen extends Component {
     }
 
     UNSAFE_componentWillMount = async() => {
+        BackHandler.addEventListener('hardwareBackPress', () => {return true});
         this.setState({
             loading: true
         })

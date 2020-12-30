@@ -25,7 +25,8 @@ import {
     TextInput,
     Keyboard,
     ImageBackground,
-    PermissionsAndroid
+    PermissionsAndroid,
+    BackHandler
 } from 'react-native';
 
 import {stylesGlobal} from '../styles/stylesGlobal';
@@ -72,6 +73,7 @@ export default class MissionScreen extends Component {
     }
 
     UNSAFE_componentWillMount = async() => {
+        BackHandler.addEventListener('hardwareBackPress', () => {return true});
         this.initListener = this.props.navigation.addListener('focus', this.init_data.bind(this));
 
     }
@@ -176,7 +178,7 @@ export default class MissionScreen extends Component {
                 takePhotoButtonTitle: 'Take Video...',
                 mediaType: 'video',
                 quality: 1.0,
-                // videoQuality: 'medium',
+                videoQuality: 'low',
                 storageOptions:{
                     skipBackup:true,
                     path:'images'
@@ -246,6 +248,11 @@ export default class MissionScreen extends Component {
 
     next_mission = async() => {
         clearInterval(this.timer);
+        this.setState({
+            text_Q_popup_show: false,
+            audio_Q_popup_show: false
+        })
+        
         if(this.state.answerType == "IMAGE") {
             this.props.navigation.navigate("PictureCheckScreen", {answerType: "IMAGE", image_uri: this.state.image_uri, questionEndTimestamp: this.props.route.params.questionEndTimestamp});
         } else if(this.state.answerType == "VIDEO") {
@@ -381,16 +388,16 @@ export default class MissionScreen extends Component {
                     <View style = {{width: '100%', height: '100%', position: "absolute", top: 0, left: 0, backgroundColor: '#000000', opacity: 0.3}}/>
                     <View style = {{width: '90%', backgroundColor: '#ffffff', borderRadius: 10}}>
                         <View style = {{width: '100%', height: 50, justifyContent: 'center', alignItems: 'center',}}>
-                            <Text style = {[stylesGlobal.general_font_style, {fontSize: 18, textAlign: 'center', color: '#000000'}]}>Please input answer</Text>
+                            <Text style = {[stylesGlobal.general_font_style, {fontSize: 18, textAlign: 'center', color: '#000000'}]}>Press enter to send</Text>
                         </View>
                         <View style = {{width: '100%', height: 1, backgroundColor: '#000000'}}/>
                         <View style = {{width: '100%', marginVertical: 10, alignItems: 'center'}}>
-                            <TextInput multiline = {true} style = {[stylesGlobal.general_font_style, {width: '90%', height: 150, borderColor: '#d0d0d0', borderWidth: 0.5, borderRadius: 5, padding: 5, fontSize: 14, color: '#000000'}]}
+                            <TextInput style = {[stylesGlobal.general_font_style, {width: '90%', height: 50, borderColor: '#d0d0d0', borderWidth: 0.5, borderRadius: 5, padding: 5, fontSize: 14, color: '#000000'}]}
                                 onChangeText = {(text) => this.setState({answer_text_temp: text})} onSubmitEditing = {() => this.textAnswer()}
                             >{this.state.answer_text_temp}</TextInput>
                         </View>
                         <View style = {{width: '100%', height: 1, backgroundColor: '#000000'}}/>
-                        <View style = {{width: '100%', marginVertical: 10, flexDirection: 'row', justifyContent: 'center'}}>
+                        {/* <View style = {{width: '100%', marginVertical: 10, flexDirection: 'row', justifyContent: 'center'}}>
                             <View style = {{width: '40%', marginRight: 20}}>
                                 <TouchableOpacity style = {[stylesGlobal.mission_button, {borderColor: '#000000',}]} onPress = {() => this.setState({text_Q_popup_show: false})}>
                                     <Text style = {[stylesGlobal.general_font_style, {fontSize: 16, textAlign: 'center', color: '#000000'}]}>CANCEL</Text>
@@ -401,7 +408,7 @@ export default class MissionScreen extends Component {
                                     <Text style = {[stylesGlobal.general_font_style, {fontSize: 16, textAlign: 'center', color: '#000000'}]}>OK</Text>
                                 </TouchableOpacity>
                             </View>
-                        </View>
+                        </View> */}
                     </View>
                 </View>
             }

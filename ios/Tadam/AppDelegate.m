@@ -43,6 +43,10 @@ static void InitializeFlipper(UIApplication *application) {
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
+
+  [[RCTI18nUtil sharedInstance] allowRTL:NO];
+  [[RCTI18nUtil sharedInstance] forceRTL:NO];
+
   return YES;
 }
 

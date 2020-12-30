@@ -24,7 +24,8 @@ import {
     KeyboardAvoidingView,
     TextInput,
     Keyboard,
-    ImageBackground
+    ImageBackground,
+    BackHandler
 } from 'react-native';
 
 import {stylesGlobal} from '../styles/stylesGlobal';
@@ -61,6 +62,7 @@ export default class PictureCheckScreen extends Component {
     }
 
     UNSAFE_componentWillMount() {
+        BackHandler.addEventListener('hardwareBackPress', () => {return true});
         this.initListener = this.props.navigation.addListener('focus', this.init_data.bind(this));
     }
 
@@ -260,6 +262,9 @@ export default class PictureCheckScreen extends Component {
                 if (response.statusCode == 200) {
                     var responseData = JSON.parse(response.body);
                     if(responseData.success) {
+                        this.setState({
+                            loading: false
+                        })
                         if(this.state.answerType == "IMAGE") {
                             this.props.navigation.navigate("CreateSummaryScreen", {answerType: "IMAGE", image_uri: this.state.image_uri, questionEndTimestamp: this.state.questionEndTimestamp});
                         } else if(this.state.answerType == "VIDEO") {
@@ -270,22 +275,25 @@ export default class PictureCheckScreen extends Component {
                             this.props.navigation.navigate("CreateSummaryScreen", {answerType: "AUDIO", audio_uri: this.state.audio_uri, questionEndTimestamp: this.state.questionEndTimestamp});
                         }
                     } else {
-                        if(this.state.answerType == "IMAGE") {
-                            this.props.navigation.navigate("CreateSummaryScreen", {answerType: "IMAGE", image_uri: "", questionEndTimestamp: this.state.questionEndTimestamp});
-                        } else if(this.state.answerType == "VIDEO") {
-                            this.props.navigation.navigate("CreateSummaryScreen", {answerType: "VIDEO", video_uri: "", questionEndTimestamp: this.state.questionEndTimestamp});
-                        } else if(this.state.answerType == "TEXT") {
-                            this.props.navigation.navigate("CreateSummaryScreen", {answerType: "TEXT", answer_text: "", questionEndTimestamp: this.state.questionEndTimestamp});
-                        } else if(this.state.answerType == "AUDIO") {
-                            this.props.navigation.navigate("CreateSummaryScreen", {answerType: "AUDIO", audio_uri: "", questionEndTimestamp: this.state.questionEndTimestamp});
-                        }
+                        this.game_state();
+                        // if(this.state.answerType == "IMAGE") {
+                        //     this.props.navigation.navigate("CreateSummaryScreen", {answerType: "IMAGE", image_uri: "", questionEndTimestamp: this.state.questionEndTimestamp});
+                        // } else if(this.state.answerType == "VIDEO") {
+                        //     this.props.navigation.navigate("CreateSummaryScreen", {answerType: "VIDEO", video_uri: "", questionEndTimestamp: this.state.questionEndTimestamp});
+                        // } else if(this.state.answerType == "TEXT") {
+                        //     this.props.navigation.navigate("CreateSummaryScreen", {answerType: "TEXT", answer_text: "", questionEndTimestamp: this.state.questionEndTimestamp});
+                        // } else if(this.state.answerType == "AUDIO") {
+                        //     this.props.navigation.navigate("CreateSummaryScreen", {answerType: "AUDIO", audio_uri: "", questionEndTimestamp: this.state.questionEndTimestamp});
+                        // }
                     }
                 } else {
+                    this.game_state();
                     console.log('SERVER ERROR');
                 }
             })
 
             .catch((err) => {
+                this.game_state();
                 if(err.description === "cancelled") {
                     // cancelled by user
                 }
@@ -310,6 +318,9 @@ export default class PictureCheckScreen extends Component {
                 console.log(responseData)
                 if(responseData.success) {
                     if(this.state.answerType == "IMAGE") {
+                        this.setState({
+                            loading: false
+                        })
                         // this.props.navigation.dispatch(
                         //     StackActions.replace("CreateSummaryScreen", {answerType: "IMAGE", image_uri: this.state.image_uri, mission: this.state.mission, questionEndTimestamp: this.props.route.params.questionEndTimestamp})
                         // )
@@ -322,27 +333,121 @@ export default class PictureCheckScreen extends Component {
                         this.props.navigation.navigate("CreateSummaryScreen", {answerType: "AUDIO", audio_uri: this.state.audio_uri, questionEndTimestamp: this.state.questionEndTimestamp});
                     }
                 } else {
-                    if(this.state.answerType == "IMAGE") {
-                        this.props.navigation.navigate("CreateSummaryScreen", {answerType: "IMAGE", image_uri: "", questionEndTimestamp: this.state.questionEndTimestamp});
-                    } else if(this.state.answerType == "VIDEO") {
-                        this.props.navigation.navigate("CreateSummaryScreen", {answerType: "VIDEO", video_uri: "", questionEndTimestamp: this.state.questionEndTimestamp});
-                    } else if(this.state.answerType == "TEXT") {
-                        this.props.navigation.navigate("CreateSummaryScreen", {answerType: "TEXT", answer_text: "", questionEndTimestamp: this.state.questionEndTimestamp});
-                    } else if(this.state.answerType == "AUDIO") {
-                        this.props.navigation.navigate("CreateSummaryScreen", {answerType: "AUDIO", audio_uri: "", questionEndTimestamp: this.state.questionEndTimestamp});
-                    }
+                    this.game_state();
+                    // if(this.state.answerType == "IMAGE") {
+                    //     this.props.navigation.navigate("CreateSummaryScreen", {answerType: "IMAGE", image_uri: "", questionEndTimestamp: this.state.questionEndTimestamp});
+                    // } else if(this.state.answerType == "VIDEO") {
+                    //     this.props.navigation.navigate("CreateSummaryScreen", {answerType: "VIDEO", video_uri: "", questionEndTimestamp: this.state.questionEndTimestamp});
+                    // } else if(this.state.answerType == "TEXT") {
+                    //     this.props.navigation.navigate("CreateSummaryScreen", {answerType: "TEXT", answer_text: "", questionEndTimestamp: this.state.questionEndTimestamp});
+                    // } else if(this.state.answerType == "AUDIO") {
+                    //     this.props.navigation.navigate("CreateSummaryScreen", {answerType: "AUDIO", audio_uri: "", questionEndTimestamp: this.state.questionEndTimestamp});
+                    // }
                 }
             })
             .catch(error => {
+                this.game_state();
                 console.log(error)
                 Alert.alert("Warning!", "Network error");
             });
         }
 
+        
+    }
+
+    game_state = async() => {
+
+        this.setState({
+            loading: true
+        })
+        this.waiting_timer = setInterval(async() => {
+            await fetch(Global.BASE_URL + 'index.php/game/?gameAuthToken=' + Global.gameAuthToken, {
+                method: "GET",
+            })
+            .then(response => {
+                return response.json();
+            })
+            .then(responseData => {
+                if(responseData.success) {
+                    if(responseData.gameState == "question") {
+                        clearInterval(this.waiting_timer);
+                        this.get_question();
+                    } else if(responseData.gameState == "results") {
+                        clearInterval(this.waiting_timer);
+                        this.setState({
+                            loading: false
+                        })
+                        this.props.navigation.navigate("YourRankScreen");
+                    } else if(responseData.gameState == "completed") {
+                        clearInterval(this.waiting_timer);
+                        this.setState({
+                            loading: false
+                        })
+                        this.props.navigation.navigate("SendEmailScreen");
+                    } else if(responseData.gameState == "rank") {
+                        clearInterval(this.waiting_timer);
+                        this.setState({
+                            loading: false
+                        })
+                        this.props.navigation.navigate("RateOthersIntroScreen");
+                    }
+                    
+                } else {
+                    this.setState({
+                        loading: false
+                    })
+                    var error_text = responseData.error_text;
+                    if(error_text == null) {
+                        error_text = "";
+                    }
+                    // Alert.alert("Warning!", error_text);
+                }
+                
+            })
+            .catch(error => {
+                console.log(error)
+                this.setState({
+                    loading: false
+                })
+                Alert.alert("Warning!", "Network error");
+            });
+        }, 5000)
+    }
+
+    get_question = async() => {
+        this.setState({
+            loading: true
+        })
+        
+        var success = false;
+        
+        await fetch(Global.BASE_URL + 'index.php/question/?gameAuthToken=' + Global.gameAuthToken, {
+            method: "GET",
+        })
+        .then(response => {
+            return response.json();
+        })
+        .then(responseData => {
+            console.log("question")
+            console.log(responseData)
+            if(responseData.success) {
+                Global.mission_order = 1;
+                this.props.navigation.navigate("MissionScreen", {question: responseData.question, answerType: responseData.answerType, numberOfPoints: responseData.numberOfPoints, questionEndTimestamp: responseData.questionEndTimestamp});
+                
+            } else {
+                var error_text = responseData.error_text;
+                if(error_text == null) {
+                    error_text = "";
+                }
+                Alert.alert("Warning!", error_text);
+            }
+        })
+        .catch(error => {
+            Alert.alert("Warning!", "Network error");
+        });
         this.setState({
             loading: false
         })
-        
     }
 
     go_backaction() {
@@ -401,6 +506,7 @@ export default class PictureCheckScreen extends Component {
                                         this._video.resume();
                                     }}
                                     style = {{width: width * 0.9 - 30, height: '100%'}}
+                                    thumbnail = {require("../assets/images/logo.png")}
                                 />
                             }
                             {

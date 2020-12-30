@@ -21,7 +21,9 @@ export default class ProgressIndicator extends React.Component {
             }
             {
                 (this.props.percentage > 0) &&
-                <Text style = {{marginTop: 20, fontSize: 32, color: '#000000'}}>{"Uploading " + this.props.percentage + "%..."}</Text>
+                <View style = {{paddingVertical: 10, paddingHorizontal: 15, backgroundColor: '#ffffff', marginTop: 20}}>
+                    <Text style = {{fontSize: 32, color: '#000000'}}>{"Uploading " + this.props.percentage + "%..."}</Text>
+                </View>
             }
             </View>
         );

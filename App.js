@@ -13,7 +13,7 @@ import {
   View,
   Text,
   StatusBar,
-  I18nManager
+  I18nManager,
 } from 'react-native';
 
 
@@ -41,8 +41,6 @@ import SendEmailScreen from './app/screens/SendEmailScreen';
 import ConclusionScreen from './app/screens/ConclusionScreen';
 
 const Stack = createStackNavigator();
-
-I18nManager.allowRTL(false);
 
 export default class App extends Component {
 

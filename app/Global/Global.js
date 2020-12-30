@@ -11,3 +11,6 @@ export const gameAuthToken = "";
 export const gamestart_time = 0;
 export const playerAuthToken = "";
 export const mission_order = 0;
+
+export const game_manager_image_path = "";
+export const gameInstructions = "";

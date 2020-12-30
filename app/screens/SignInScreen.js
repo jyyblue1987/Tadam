@@ -23,7 +23,8 @@ import {
     TouchableOpacity,
     KeyboardAvoidingView,
     TextInput,
-    Keyboard
+    Keyboard,
+    BackHandler
 } from 'react-native';
 
 import {stylesGlobal} from '../styles/stylesGlobal';
@@ -47,12 +48,15 @@ export default class SignInScreen extends Component {
     }
 
     UNSAFE_componentWillMount() {
+        
+        BackHandler.addEventListener('hardwareBackPress', () => {return true});
         setTimeout(async() => {
             this.setState({
                 isSplashScreen: false
             });
         }, 1000);
     }
+    
 
     onContinue = async() => {
         // var other_game_members_data = [{"answer": "https://dev.edit.co.il/tadam/files/o9DnQjvwz24RgiEahxaY/5f28ca0b22b3c.mp3", "answerType": "AUDIO", "voteTargetAuthToken": "5f28c93e7796e"}, {"answer": "https://dev.edit.co.il/tadam/files/o9DnQjvwz24RgiEahxaY/5f28ca0b26100.mp3", "answerType": "AUDIO", "voteTargetAuthToken": "5f28c9409eccf"}, {"answer": "https://dev.edit.co.il/tadam/files/o9DnQjvwz24RgiEahxaY/5f28ca0b2812a.mp3", "answerType": "AUDIO", "voteTargetAuthToken": "5f28c942876bb"}]
@@ -76,10 +80,11 @@ export default class SignInScreen extends Component {
             return response.json();
         })
         .then(responseData => {
-            
+            console.log(responseData)
             if(responseData.success) {
                 Global.gameAuthToken = responseData.gameAuthToken;
                 Global.gamestart_time = responseData.gameStartTimestamp;
+                this.get_gamemanager_profile();
                 this.props.navigation.navigate("CreateNameScreen");
             } else {
                 var error_text = responseData.error_text;
@@ -96,6 +101,41 @@ export default class SignInScreen extends Component {
         this.setState({
             loading: false
         })
+    }
+
+    get_gamemanager_profile = async() => {
+        await fetch(Global.BASE_URL + 'index.php/game/?gameAuthToken=' + Global.gameAuthToken, {
+            method: "GET",
+        })
+        .then(response => {
+            return response.json();
+        })
+        .then(responseData => {
+            console.log("game start intro response")
+            console.log(responseData)
+            if(responseData.success) {
+                
+                if(responseData.gameManagerProfileImage != null && responseData.gameManagerProfileImage != "") {
+                    Global.game_manager_image_path = responseData.gameManagerProfileImage;
+                    Global.gameInstructions = responseData.gameInstructions;
+                }
+                
+            } else {
+                
+                var error_text = responseData.error_text;
+                if(error_text == null) {
+                    error_text = "";
+                }
+            }
+            
+        })
+        .catch(error => {
+            console.log(error)
+            this.setState({
+                loading: false
+            })
+            Alert.alert("Warning!", "Network error");
+        });
     }
 
     render() {

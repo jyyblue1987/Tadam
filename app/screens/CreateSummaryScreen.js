@@ -24,7 +24,8 @@ import {
     KeyboardAvoidingView,
     TextInput,
     Keyboard,
-    ImageBackground
+    ImageBackground,
+    BackHandler
 } from 'react-native';
 
 import {stylesGlobal} from '../styles/stylesGlobal';
@@ -53,6 +54,8 @@ export default class CreateSummaryScreen extends Component {
     }
 
     componentDidMount() {
+
+        BackHandler.addEventListener('hardwareBackPress', () => {return true});
 
         this.initListener = this.props.navigation.addListener('focus', this.init_data.bind(this));
         
@@ -223,6 +226,7 @@ export default class CreateSummaryScreen extends Component {
                                         this._video.resume();
                                     }}
                                     style = {{width: width * 0.9 - 30, height: '100%'}}
+                                    thumbnail = {require("../assets/images/logo.png")}
                                 />
                                 
                             }
